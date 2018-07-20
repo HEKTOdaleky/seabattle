@@ -15,7 +15,7 @@ export const actions = {
 
 };
 
-export const initialState = List({
+export const initialState = fromJS({
     pending: false,
     shoot:true,
 });

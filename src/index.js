@@ -1,5 +1,5 @@
 import { render } from 'react-dom'
-// import './styles/app.css'
+import './styles/style.css'
 import { fromJS } from 'immutable'
 import { Provider } from 'react-redux'
 import configureStore from './store/configureStore'
