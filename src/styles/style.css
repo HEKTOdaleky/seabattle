@@ -1,0 +1,27 @@
+.App {
+  height: 200px;
+  width: 200px;
+  background: #cccccc;
+  display: flex;
+  flex-wrap: wrap; }
+
+.field, .clean, .shot {
+  height: 18px;
+  width: 18px;
+  background: greenyellow;
+  border: 1px solid black;
+  display: flex; }
+  .field:hover, .clean:hover, .shot:hover {
+    background: yellow; }
+
+.clean {
+  background: greenyellow;
+  position: relative;
+  z-index: 1; }
+
+.shot {
+  background: transparent; }
+
+.innerState {
+  margin: auto;
+  z-index: 1; }

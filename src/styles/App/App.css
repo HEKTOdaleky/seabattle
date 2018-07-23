@@ -1,4 +1,6 @@
 .App {
-  height: 100px;
-  width: 100px;
-  background: #cccccc; }
+  height: 200px;
+  width: 200px;
+  background: #cccccc;
+  display: flex;
+  flex-wrap: wrap; }
