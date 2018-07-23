@@ -63,7 +63,7 @@ export const initialState = fromJS({
   pending: false,
   shoot: true,
   fields: generateField(),
-  ships: []
+  ships: {}
 });
 
 export default handleActions({
@@ -76,7 +76,6 @@ export default handleActions({
       .set('ship', true).set('name',payload.shipName))
   },
   [`${SHIP_CORDS}`]: (state, {payload}) => {
-    return state.set('ships', payload.shipName)
-  },
-
+    return state.set('ships',payload.items)
+  }
 }, initialState);

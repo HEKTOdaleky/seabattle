@@ -24,10 +24,13 @@ class App extends Component {
       <div className="App">
 
         {
-          game.fields.map(item => <Item key={item.id}
-                                        ship={item.ship}
-                                        state={item.state}
-                                        click={() => this.shotHandler(item.id)}/>)
+          game.fields.map(item =>
+            <Item
+              key={item.id}
+              ship={item.ship}
+              state={item.state}
+              click={() => this.shotHandler(item.id)}
+            />)
         }
       </div>
     );
