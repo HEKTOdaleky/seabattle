@@ -4,94 +4,70 @@ import {fromJS} from 'immutable'
 /*
 * Constants
 * */
-const SHOT_CLASS = 'SHOT_CLASS';
-const SHIP_CLASS = 'SHIP_CLASS';
-const SHIP_CORDS = 'SHIP_CORDS';
-const SHIP_REMOVE = 'SHIP_REMOVE';
-
-const SHOT_FIELDS = 'shot';
-
+const SHOT = 'SHOT';
+const GENERATE_SHIP = 'GENERATE_SHIP';
+const STATUS_SHIP = 'STATUS_SHIP';
 
 /*
  * Actions
  * */
-export const setShotClass = createAction(SHOT_CLASS, (index) => {
-  return {index}
-});
-
-export const setShipClass = createAction(SHIP_CLASS, (index, shipName) => {
-  return {index, shipName}
-});
-
-export const currentShips = createAction(SHIP_CORDS, items => {
-  return {items}
-});
-
-export const removeShips = createAction(SHIP_REMOVE, (ship,boats) => {
-  return {ship,boats}
-});
+export const shot = createAction(SHOT, cell => cell);
+export const setShip = createAction(GENERATE_SHIP, ship => ship);
+export const statusShip = createAction(STATUS_SHIP, ship => ship);
 
 
-export const actions = {};
-
-export const addShip = shipArray => {
-
+const generateShip = ship => {
+  console.log(ship);
   return dispatch => {
-    dispatch(currentShips(shipArray));
-    Object.keys(shipArray).map(item => {
-      shipArray[item].map(position => {
-        dispatch(setShipClass(position, item));
-      })
+    dispatch(statusShip(ship));
+    ship.cells.map(cell => {
+      console.log(cell, "GENERATE_SHIP");
+      dispatch(setShip(cell))
     })
   }
 };
-
-export const shipShot = index => {
-  return (dispatch, getState) => {
-    dispatch(setShotClass(index));
-    const {game} = getState().toJS();
-    let shipName = game.fields[index].name;
-    if (!shipName)
-      return
-    let newShip = game.ships[shipName].filter(ship => ship !== index);
-    if (newShip.length === 0)
-      alert(`${shipName} Убит!`)
-    dispatch(removeShips(shipName,newShip))
-
-  }
+export const actions = {
+  shot,
+  generateShip
 };
 
-const generateField = () => {
-  const fields = [];
-  for (let i = 0; i < 100; i++) {
 
-    fields.push({id: i, state: 'clean', ship: false});
+const generateField = () => {
+  const cells = [];
+  let y = 0;
+  let x = 0;
+
+  for (let i = 0; i < 100; i++) {
+    x += 1;
+    if (i % 10 === 0) {
+      y += 1;
+      x = 0;
+    }
+    // status can be: empty, miss, placed, shot
+    cells.push({x, y, index: i, status: 'empty'});
   }
 
-  return fields;
+  return cells;
 };
 
 export const initialState = fromJS({
-  pending: false,
-  shoot: true,
   fields: generateField(),
-  ships: {}
+  ships: []
 });
 
 export default handleActions({
-  [`${SHOT_CLASS}`]: (state, {payload}) => {
-    return state.updateIn(['fields', payload.index], entry => entry
-      .set('state', SHOT_FIELDS))
+  [GENERATE_SHIP]: (state, {payload}) => {
+    console.log(payload, "REDUCER")
+    const {x, y, index} = payload;
+    return state.updateIn(['fields', `${index}`], entry =>
+      entry.merge({
+        x, y, status: 'placed'
+      }))
+      // .update('ships', entry => entry.push(payload))
   },
-  [`${SHIP_CLASS}`]: (state, {payload}) => {
-    return state.updateIn(['fields', payload.index], entry => entry
-      .set('ship', true).set('name', payload.shipName))
-  },
-  [`${SHIP_CORDS}`]: (state, {payload}) => {
-    return state.set('ships', payload.items)
-  },
-  [`${SHIP_REMOVE}`]: (state, {payload}) => {
-    console.log(payload.ship,payload.boats)
-    return state.setIn(['ships', payload.ship], entry => console.log(entry))
+  [STATUS_SHIP]: (state, {payload}) => {
+    console.log(payload, "STATUSREDUCER")
+    const {x, y, index} = payload;
+    return state.update('ships', entry => entry.push(payload))
   }
 }, initialState);

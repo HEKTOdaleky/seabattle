@@ -1,49 +1,50 @@
-import React, {Component} from 'react';
-import Item from "./components/Item/Item";
-import {connect} from "react-redux";
-import {addShip, shipShot} from "./store/game/game";
+import React from 'react';
+import PropTypes from 'prop-types'
+import connectWrapper from './store/utils/connectWrapper'
+import { rootActions } from './store/rootReducer'
+import Cell from './components/Cell/Cell'
 
-class App extends Component {
-  componentDidMount() {
-    this.props.addShip({
-      tree1: [2, 3, 4],
-      tree2: [23, 24, 25],
-      four: [45, 55, 65, 75]
-    })
-  }
-
-  shotHandler = field => {
-    this.props.setShotClass(field)
-
+export class App extends React.Component {
+  static propTypes = {
+    state: PropTypes.object.isRequired,
+    actions: PropTypes.object.isRequired
   };
 
-  render() {
+  componentDidMount() {
+    const ship = {
+      cellsIndex: [0,0],
+      cells: [
+        {
+        x: 0,
+        y: 0,
+        index: 0,
+        status: 'clean'
+      },
+      {
+        x: 1,
+        y: 0,
+        index: 1,
+        status: 'clean'
+      }
+      ]
+    };
+    this.props.actions.generateShip(ship);
+  }
 
+  render() {
     const {game} = this.props.state.toJS();
     return (
       <div className="App">
-
-        {
-          game.fields.map(item =>
-            <Item
-              key={item.id}
-              ship={item.ship}
-              state={item.state}
-              click={() => this.shotHandler(item.id)}
-            />)
-        }
+        {game.fields.map(item => (
+          <Cell
+            key={`cell-${item.index}`}
+            cell={item}
+            onShot={this.props.actions.shot}
+          />
+        ))}
       </div>
     );
   }
 }
 
-const mapStateToProps = state => ({
-  state: state
-});
-
-const mapDispatchToProps = dispatch => ({
-  setShotClass: (index) => dispatch( shipShot(index)),
-  addShip: array => dispatch(addShip(array))
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(App);
+export default connectWrapper(rootActions, App);
