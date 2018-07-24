@@ -57,17 +57,23 @@ export const initialState = fromJS({
 
 export default handleActions({
   [GENERATE_SHIP]: (state, {payload}) => {
-    console.log(payload, "REDUCER")
-    const {x, y, index} = payload;
+    console.log(payload, "REDUCER");
+    const {x, y, index, shipId} = payload;
     return state.updateIn(['fields', `${index}`], entry =>
       entry.merge({
-        x, y, status: 'placed'
+        x, y, status: 'placed', shipId
       }))
-      // .update('ships', entry => entry.push(payload))
+    // .update('ships', entry => entry.push(payload))
   },
+
   [STATUS_SHIP]: (state, {payload}) => {
-    console.log(payload, "STATUSREDUCER")
+    console.log(payload, "STATUSREDUCER");
     const {x, y, index} = payload;
     return state.update('ships', entry => entry.push(payload))
-  }
+  },
+
+  [SHOT]: (state, {payload}) => {
+    return state.updateIn(['fields', payload], entry => entry
+      .set('status', 'shot'))
+  },
 }, initialState);

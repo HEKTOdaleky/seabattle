@@ -9,6 +9,16 @@ export default class Cell extends React.Component {
   };
 
   shot = () => {
+    switch (this.props.status) {
+      case 'miss':
+      case 'shot':
+        return null;
+
+      case 'empty':
+      default:
+        return this.props.onShot(this.props.cell.index);
+    }
+
     // const { status, x, y } = this.props.cell;
   };
 

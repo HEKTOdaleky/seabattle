@@ -12,19 +12,22 @@ export class App extends React.Component {
 
   componentDidMount() {
     const ship = {
+      shipId: 1,
       cellsIndex: [0,0],
       cells: [
         {
-        x: 0,
-        y: 0,
-        index: 0,
-        status: 'clean'
+          x: 0,
+          y: 0,
+          index: 0,
+          status: 'clean',
+          shipId: 1
       },
       {
-        x: 1,
-        y: 0,
-        index: 1,
-        status: 'clean'
+          x: 1,
+          y: 0,
+          index: 1,
+          status: 'clean',
+          shipId: 1
       }
       ]
     };
