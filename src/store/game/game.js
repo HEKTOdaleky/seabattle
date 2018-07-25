@@ -5,6 +5,7 @@ import {fromJS} from 'immutable'
 * Constants
 * */
 const SHOT = 'SHOT';
+const MISS = 'MISS';
 const GENERATE_SHIP = 'GENERATE_SHIP';
 const STATUS_SHIP = 'STATUS_SHIP';
 
@@ -12,17 +13,30 @@ const STATUS_SHIP = 'STATUS_SHIP';
  * Actions
  * */
 export const shot = createAction(SHOT, cell => cell);
+export const miss = createAction(MISS, cell => cell);
+
 export const setShip = createAction(GENERATE_SHIP, ship => ship);
 export const statusShip = createAction(STATUS_SHIP, ship => ship);
 
+
+export const shoot = index => {
+  return (dispatch, getState) => {
+    const currentCell = getState().toJS().game.fields[index];
+    if (currentCell.shipId)
+      dispatch(shot(index));
+    else
+      dispatch(miss(index));
+
+  }
+};
 
 const generateShip = shipList => {
   return dispatch => {
     shipList.map(ship => {
       dispatch(statusShip(ship));
       ship.cells.map(cell => {
-        const index=Number.parseInt(cell.y+''+cell.x);
-        cell.index=index;
+        const index = Number.parseInt(cell.y + '' + cell.x);
+        cell.index = index;
         dispatch(setShip(cell))
       })
     });
@@ -30,7 +44,7 @@ const generateShip = shipList => {
   }
 };
 export const actions = {
-  shot,
+  shoot,
   generateShip
 };
 
@@ -75,5 +89,9 @@ export default handleActions({
   [SHOT]: (state, {payload}) => {
     return state.updateIn(['fields', payload], entry => entry
       .set('status', 'shot'))
+  },
+  [MISS]: (state, {payload}) => {
+    return state.updateIn(['fields', payload], entry => entry
+      .set('status', 'miss'))
   },
 }, initialState);

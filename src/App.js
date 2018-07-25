@@ -64,7 +64,8 @@ export class App extends React.Component {
           <Cell
             key={`cell-${item.index}`}
             cell={item}
-            onShot={this.props.actions.shot}
+            onShot={this.props.actions.shoot}
+            isShip={item.shipId}
           />
         ))}
       </div>

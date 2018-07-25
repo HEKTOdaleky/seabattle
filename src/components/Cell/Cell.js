@@ -5,7 +5,8 @@ import classnames from 'classnames'
 export default class Cell extends React.Component {
   static propTypes = {
     cell: PropTypes.object.isRequired,
-    onShot: PropTypes.func.isRequired
+    onShot: PropTypes.func.isRequired,
+    isShip: PropTypes.number
   };
 
   shot = () => {
@@ -22,13 +23,14 @@ export default class Cell extends React.Component {
     // const { status, x, y } = this.props.cell;
   };
 
-  render () {
-    const { status } = this.props.cell;
+  render() {
+    const status = this.props.cell.status;
     const cellClassnames = classnames('field', {
       [status]: status
     });
     return (
-      <div className={cellClassnames} onClick={this.shot} />
+      <div className={cellClassnames} onClick={this.shot}>
+      </div>
     )
   }
 }
