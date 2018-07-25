@@ -6,6 +6,7 @@ import {fromJS} from 'immutable'
 * */
 const SHOT = 'SHOT';
 const MISS = 'MISS';
+const BOAT_DOWN = 'BOAT_DOWN';
 const GENERATE_SHIP = 'GENERATE_SHIP';
 const STATUS_SHIP = 'STATUS_SHIP';
 
@@ -14,21 +15,42 @@ const STATUS_SHIP = 'STATUS_SHIP';
  * */
 export const shot = createAction(SHOT, cell => cell);
 export const miss = createAction(MISS, cell => cell);
+export const boatDown = createAction(BOAT_DOWN, cell => cell);
 
-export const setShip = createAction(GENERATE_SHIP, ship => ship);
-export const statusShip = createAction(STATUS_SHIP, ship => ship);
 
+const setShip = createAction(GENERATE_SHIP, ship => ship);
+const statusShip = createAction(STATUS_SHIP, ship => ship);
+const destroyShip = (ship, index) => {
+  return dispatch => {
+    let shipSize;
+    let currentIndex;
+    ship.ships.map((ship, i) => {
+      if (ship.shipId === index) {
+        shipSize = ship.cellsIndex;
+        shipSize.length=shipSize.length-1;
+        currentIndex = i;
+      }
+
+    });
+    dispatch(boatDown(shipSize,currentIndex));
+  }
+};
 
 export const shoot = index => {
   return (dispatch, getState) => {
-    const currentCell = getState().toJS().game.fields[index];
-    if (currentCell.shipId)
+    const {game} = getState().toJS();
+    const currentCell = game.fields[index];
+
+    if (currentCell.shipId) {
       dispatch(shot(index));
+      dispatch(destroyShip(game, currentCell.shipId));
+    }
     else
       dispatch(miss(index));
 
   }
 };
+
 
 const generateShip = shipList => {
   return dispatch => {
@@ -94,4 +116,11 @@ export default handleActions({
     return state.updateIn(['fields', payload], entry => entry
       .set('status', 'miss'))
   },
+//   [BOAT_DOWN]: (state, {payload}) => {
+//     const {shipSize,currentIndex} = payload;
+//   return state.updateIn(['fields', `${currentIndex}`], entry =>
+//       entry.merge({
+//         currentIndex:shipSize
+//       }))
+// },
 }, initialState);
