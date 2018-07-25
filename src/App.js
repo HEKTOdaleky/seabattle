@@ -11,26 +11,48 @@ export class App extends React.Component {
   };
 
   componentDidMount() {
-    const ship = {
+    const ship = [{
       shipId: 1,
       cellsIndex: [0,0],
       cells: [
         {
           x: 0,
           y: 0,
-          index: 0,
           status: 'clean',
           shipId: 1
       },
       {
           x: 1,
           y: 0,
-          index: 1,
           status: 'clean',
           shipId: 1
       }
       ]
-    };
+    },
+      {
+        shipId: 2,
+        cellsIndex: [0,0,0],
+        cells: [
+          {
+            x: 3,
+            y: 5,
+            status: 'clean',
+            shipId: 2
+          },
+          {
+            x: 4,
+            y: 5,
+            status: 'clean',
+            shipId: 2
+          },
+          {
+            x: 5,
+            y: 5,
+            status: 'clean',
+            shipId: 2
+          }
+        ]
+      }];
     this.props.actions.generateShip(ship);
   }
 

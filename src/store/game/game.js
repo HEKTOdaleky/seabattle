@@ -16,14 +16,17 @@ export const setShip = createAction(GENERATE_SHIP, ship => ship);
 export const statusShip = createAction(STATUS_SHIP, ship => ship);
 
 
-const generateShip = ship => {
-  console.log(ship);
+const generateShip = shipList => {
   return dispatch => {
-    dispatch(statusShip(ship));
-    ship.cells.map(cell => {
-      console.log(cell, "GENERATE_SHIP");
-      dispatch(setShip(cell))
-    })
+    shipList.map(ship => {
+      dispatch(statusShip(ship));
+      ship.cells.map(cell => {
+        const index=Number.parseInt(cell.y+''+cell.x);
+        cell.index=index;
+        dispatch(setShip(cell))
+      })
+    });
+
   }
 };
 export const actions = {
@@ -57,17 +60,14 @@ export const initialState = fromJS({
 
 export default handleActions({
   [GENERATE_SHIP]: (state, {payload}) => {
-    console.log(payload, "REDUCER");
     const {x, y, index, shipId} = payload;
     return state.updateIn(['fields', `${index}`], entry =>
       entry.merge({
         x, y, status: 'placed', shipId
       }))
-    // .update('ships', entry => entry.push(payload))
   },
 
   [STATUS_SHIP]: (state, {payload}) => {
-    console.log(payload, "STATUSREDUCER");
     const {x, y, index} = payload;
     return state.update('ships', entry => entry.push(payload))
   },
