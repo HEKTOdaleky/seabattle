@@ -32,12 +32,31 @@ const destroyShip = (ship, index) => {
 
         dispatch(boatDown({shipSize, currentIndex}));
         if (!shipSize.length > 0)
-          alert("Корабль потоплен")
+          dispatch(setMissnearShip(ship.cells))
       }
+      return null;
 
     });
 
   }
+};
+
+const setMissnearShip = ship =>{
+  /*Метод не реализован, внутри фигня*/
+  console.log(ship)
+
+  return dispatch=>(
+  ship.map(cell=>{
+    let missCells= Number.parseInt(cell.y+1 + ''+cell.x);
+    dispatch(shoot(missCells));
+    missCells= Number.parseInt(cell.y-1 + ''+cell.x);
+    dispatch(shoot(missCells));
+    return null;
+
+
+
+  }))
+
 };
 
 export const shoot = index => {
@@ -108,7 +127,6 @@ export default handleActions({
   },
 
   [STATUS_SHIP]: (state, {payload}) => {
-    const {x, y, index} = payload;
     return state.update('ships', entry => entry.push(payload))
   },
 

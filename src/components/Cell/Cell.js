@@ -10,12 +10,12 @@ export default class Cell extends React.Component {
   };
 
   shot = () => {
-    switch (this.props.status) {
+    switch (this.props.cell.status) {
       case 'miss':
+        return null;
       case 'shot':
         return null;
 
-      case 'empty':
       default:
         return this.props.onShot(this.props.cell.index);
     }
