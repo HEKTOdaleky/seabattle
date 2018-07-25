@@ -15,7 +15,7 @@ const STATUS_SHIP = 'STATUS_SHIP';
  * */
 export const shot = createAction(SHOT, cell => cell);
 export const miss = createAction(MISS, cell => cell);
-export const boatDown = createAction(BOAT_DOWN, cell => cell);
+export const boatDown = createAction(BOAT_DOWN, ship => ship);
 
 
 const setShip = createAction(GENERATE_SHIP, ship => ship);
@@ -27,12 +27,16 @@ const destroyShip = (ship, index) => {
     ship.ships.map((ship, i) => {
       if (ship.shipId === index) {
         shipSize = ship.cellsIndex;
-        shipSize.length=shipSize.length-1;
+        shipSize.length = shipSize.length - 1;
         currentIndex = i;
+
+        dispatch(boatDown({shipSize, currentIndex}));
+        if (!shipSize.length > 0)
+          alert("Корабль потоплен")
       }
 
     });
-    dispatch(boatDown(shipSize,currentIndex));
+
   }
 };
 
@@ -116,11 +120,11 @@ export default handleActions({
     return state.updateIn(['fields', payload], entry => entry
       .set('status', 'miss'))
   },
-//   [BOAT_DOWN]: (state, {payload}) => {
-//     const {shipSize,currentIndex} = payload;
-//   return state.updateIn(['fields', `${currentIndex}`], entry =>
-//       entry.merge({
-//         currentIndex:shipSize
-//       }))
-// },
+  [BOAT_DOWN]: (state, {payload}) => {
+    const {shipSize, currentIndex} = payload;
+    return state.updateIn(['fields', `${currentIndex}`], entry =>
+      entry.merge({
+        currentIndex: shipSize
+      }))
+  },
 }, initialState);
