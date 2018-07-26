@@ -41,21 +41,26 @@ const destroyShip = (ship, index) => {
   }
 };
 
-const setMissnearShip = ship =>{
+const setMissnearShip = ship => {
   /*Метод не реализован, внутри фигня*/
-  console.log(ship)
+  console.log(ship);
 
-  return dispatch=>(
-  ship.map(cell=>{
-    let missCells= Number.parseInt(cell.y+1 + ''+cell.x);
-    dispatch(shoot(missCells));
-    missCells= Number.parseInt(cell.y-1 + ''+cell.x);
-    dispatch(shoot(missCells));
-    return null;
+  return dispatch => (
+    ship.map(cell => {
+      for (let x = -1; x < 2; x++) {
+        for (let y = -1; y < 2; y++) {
+          let xPossition = cell.x - x;
+          let yPossition = cell.y - y;
+          if (xPossition < 0 || yPossition < 0)
+            continue;
+          else
+            dispatch(clearAroundShip(Number.parseInt(yPossition + '' + xPossition)));
+
+        }
+      }
 
 
-
-  }))
+    }))
 
 };
 
@@ -74,6 +79,18 @@ export const shoot = index => {
   }
 };
 
+export const clearAroundShip = index => {
+  return (dispatch, getState) => {
+    const {game} = getState().toJS();
+    const currentCell = game.fields[index];
+
+    if (currentCell.status==='empty') {
+      dispatch(miss(index));
+    }
+
+
+  }
+};
 
 const generateShip = shipList => {
   return dispatch => {
