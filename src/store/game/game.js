@@ -34,7 +34,7 @@ const destroyShip = (ship, index) => {
 
         dispatch(boatDown({shipSize, currentIndex}));
         if (!shipSize.length > 0)
-          dispatch(setMissnearShip(ship.cells,clearAroundShip))
+          dispatch(setMissNearShip(ship.cells,clearAroundShip))
       }
       return null;
 
@@ -42,7 +42,7 @@ const destroyShip = (ship, index) => {
 
   }
 };
-const setMissnearShip = (ship,callback) => {
+const setMissNearShip = (ship,callback) => {
 
   return dispatch => (
     ship.map(cell => {
@@ -50,7 +50,7 @@ const setMissnearShip = (ship,callback) => {
         for (let y = -1; y < 2; y++) {
           let xPosition = cell.x - x;
           let yPosition = cell.y - y;
-          if (xPosition < 0 || yPosition < 0)
+          if (xPosition < 0 || yPosition < 0||xPosition > 9 || yPosition > 9)
             continue;
           else
             dispatch(callback(Number.parseInt(yPosition + '' + xPosition)));
@@ -106,7 +106,7 @@ const generateShip = shipList => {
   return dispatch => {
     shipList.map(ship => {
       dispatch(statusShip(ship));
-      dispatch(setMissnearShip(ship.cells, placedAroundShip));
+      dispatch(setMissNearShip(ship.cells, placedAroundShip));
 
       ship.cells.map(cell => {
         const index = Number.parseInt(cell.y + '' + cell.x);
