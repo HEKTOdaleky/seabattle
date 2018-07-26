@@ -6,6 +6,7 @@ import {fromJS} from 'immutable'
 * */
 const SHOT = 'SHOT';
 const MISS = 'MISS';
+const PLACED = 'PLACED';
 const BOAT_DOWN = 'BOAT_DOWN';
 const GENERATE_SHIP = 'GENERATE_SHIP';
 const STATUS_SHIP = 'STATUS_SHIP';
@@ -15,6 +16,8 @@ const STATUS_SHIP = 'STATUS_SHIP';
  * */
 export const shot = createAction(SHOT, cell => cell);
 export const miss = createAction(MISS, cell => cell);
+export const placed = createAction(PLACED, cell => cell);
+
 export const boatDown = createAction(BOAT_DOWN, ship => ship);
 const setShip = createAction(GENERATE_SHIP, ship => ship);
 const statusShip = createAction(STATUS_SHIP, ship => ship);
@@ -31,7 +34,7 @@ const destroyShip = (ship, index) => {
 
         dispatch(boatDown({shipSize, currentIndex}));
         if (!shipSize.length > 0)
-          dispatch(setMissnearShip(ship.cells))
+          dispatch(setMissnearShip(ship.cells,clearAroundShip))
       }
       return null;
 
@@ -39,7 +42,7 @@ const destroyShip = (ship, index) => {
 
   }
 };
-const setMissnearShip = ship => {
+const setMissnearShip = (ship,callback) => {
 
   return dispatch => (
     ship.map(cell => {
@@ -50,7 +53,7 @@ const setMissnearShip = ship => {
           if (xPosition < 0 || yPosition < 0)
             continue;
           else
-            dispatch(clearAroundShip(Number.parseInt(yPosition + '' + xPosition)));
+            dispatch(callback(Number.parseInt(yPosition + '' + xPosition)));
 
         }
       }
@@ -78,8 +81,21 @@ export const clearAroundShip = index => {
     const {game} = getState().toJS();
     const currentCell = game.fields[index];
 
-    if (currentCell.status==='empty') {
+    if (currentCell.status==='empty'||currentCell.status==='placed') {
       dispatch(miss(index));
+    }
+
+
+  }
+};
+
+export const placedAroundShip = index => {
+  return (dispatch, getState) => {
+    const {game} = getState().toJS();
+    const currentCell = game.fields[index];
+
+    if (currentCell.status==='empty') {
+      dispatch(placed(index));
     }
 
 
@@ -90,11 +106,14 @@ const generateShip = shipList => {
   return dispatch => {
     shipList.map(ship => {
       dispatch(statusShip(ship));
+      dispatch(setMissnearShip(ship.cells, placedAroundShip));
+
       ship.cells.map(cell => {
         const index = Number.parseInt(cell.y + '' + cell.x);
         cell.index = index;
-        dispatch(setShip(cell))
-      })
+        dispatch(setShip(cell));
+
+      });
     });
 
   }
@@ -148,6 +167,10 @@ export default handleActions({
   [MISS]: (state, {payload}) => {
     return state.updateIn(['fields', payload], entry => entry
       .set('status', 'miss'))
+  },
+  [PLACED]: (state, {payload}) => {
+    return state.updateIn(['fields', payload], entry => entry
+      .set('status', 'placed'))
   },
   [BOAT_DOWN]: (state, {payload}) => {
     const {shipSize, currentIndex} = payload;
