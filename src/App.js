@@ -30,6 +30,24 @@ export class App extends React.Component {
       ]
     },
       {
+        shipId: 3,
+        cellsIndex: [0,0],
+        cells: [
+          {
+            x: 0,
+            y: 2,
+            status: 'clean',
+            shipId: 3
+          },
+          {
+            x: 1,
+            y: 2,
+            status: 'clean',
+            shipId: 3
+          }
+        ]
+      },
+      {
         shipId: 2,
         cellsIndex: [0,0,0],
         cells: [
