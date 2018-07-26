@@ -16,10 +16,9 @@ const STATUS_SHIP = 'STATUS_SHIP';
 export const shot = createAction(SHOT, cell => cell);
 export const miss = createAction(MISS, cell => cell);
 export const boatDown = createAction(BOAT_DOWN, ship => ship);
-
-
 const setShip = createAction(GENERATE_SHIP, ship => ship);
 const statusShip = createAction(STATUS_SHIP, ship => ship);
+
 const destroyShip = (ship, index) => {
   return dispatch => {
     let shipSize;
@@ -40,21 +39,18 @@ const destroyShip = (ship, index) => {
 
   }
 };
-
 const setMissnearShip = ship => {
-  /*Метод не реализован, внутри фигня*/
-  console.log(ship);
 
   return dispatch => (
     ship.map(cell => {
       for (let x = -1; x < 2; x++) {
         for (let y = -1; y < 2; y++) {
-          let xPossition = cell.x - x;
-          let yPossition = cell.y - y;
-          if (xPossition < 0 || yPossition < 0)
+          let xPosition = cell.x - x;
+          let yPosition = cell.y - y;
+          if (xPosition < 0 || yPosition < 0)
             continue;
           else
-            dispatch(clearAroundShip(Number.parseInt(yPossition + '' + xPossition)));
+            dispatch(clearAroundShip(Number.parseInt(yPosition + '' + xPosition)));
 
         }
       }
@@ -63,7 +59,6 @@ const setMissnearShip = ship => {
     }))
 
 };
-
 export const shoot = index => {
   return (dispatch, getState) => {
     const {game} = getState().toJS();
@@ -78,7 +73,6 @@ export const shoot = index => {
 
   }
 };
-
 export const clearAroundShip = index => {
   return (dispatch, getState) => {
     const {game} = getState().toJS();
