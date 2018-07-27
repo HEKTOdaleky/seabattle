@@ -11,7 +11,8 @@ const PLACED = 'PLACED';
 const BOAT_DOWN = 'BOAT_DOWN';
 const GENERATE_SHIP = 'GENERATE_SHIP';
 const STATUS_SHIP = 'STATUS_SHIP';
-
+const INCREMENT_SHIP = 'INCREMENT_SHIP';
+const DECREMENT_SHIP = 'DECREMENT_SHIP';
 
 
 /*
@@ -24,6 +25,9 @@ export const placed = createAction(PLACED, cell => cell);
 export const boatDown = createAction(BOAT_DOWN, ship => ship);
 const setShip = createAction(GENERATE_SHIP, ship => ship);
 const statusShip = createAction(STATUS_SHIP, ship => ship);
+const incementShip = createAction(INCREMENT_SHIP);
+const decementShip = createAction(DECREMENT_SHIP);
+
 
 const destroyShip = (ship, index) => {
   return dispatch => {
@@ -36,8 +40,10 @@ const destroyShip = (ship, index) => {
         currentIndex = i;
 
         dispatch(boatDown({shipSize, currentIndex}));
-        if (!shipSize.length > 0)
-          dispatch(setMissNearShip(ship.cells, clearAroundShip))
+        if (!shipSize.length > 0){
+          dispatch(setMissNearShip(ship.cells, clearAroundShip));
+          dispatch(decementShip());}
+
       }
       return null;
 
@@ -123,7 +129,6 @@ const generateShip = shipList => {
 };
 
 
-
 const cordParser = number => {
   let index = number + '';
   if (index.length === 1)
@@ -167,6 +172,8 @@ const autoGenerateShips = ship => {
     console.log(iterator, "COUNT_ITERATOR");
     console.log(tmp);
     dispatch(generateShip([tmp]));
+    dispatch(incementShip());
+
 
 
   }
@@ -201,7 +208,9 @@ const generateField = () => {
 
 export const initialState = fromJS({
   fields: generateField(),
-  ships: []
+  ships: [],
+  allShips: 0
+
 });
 
 export default handleActions({
@@ -236,4 +245,14 @@ export default handleActions({
         currentIndex: shipSize
       }))
   },
+  [INCREMENT_SHIP]: (state) => {
+    const {allShips}=state.toJS();
+    console.log(allShips, "STATE!!!!!!!");
+    return state.set('allShips', allShips+1);
+  },
+  [DECREMENT_SHIP]: (state) => {
+    const {allShips}=state.toJS();
+    console.log(allShips, "STATE!!!!!!!");
+    return state.set('allShips', allShips-1);
+  }
 }, initialState);
