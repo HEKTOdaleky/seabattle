@@ -14,6 +14,7 @@ export class App extends React.Component {
     this.props.actions.runShipGenerator();
   }
 
+
   render() {
     const {game} = this.props.state.toJS();
     return (

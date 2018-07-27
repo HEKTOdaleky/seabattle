@@ -29,10 +29,12 @@ const incementShip = createAction(INCREMENT_SHIP);
 const decementShip = createAction(DECREMENT_SHIP);
 
 
-const destroyShip = (ship, index) => {
-  return dispatch => {
+
+const  destroyShip = (ship, index) => {
+  return (dispatch,getState) => {
     let shipSize;
     let currentIndex;
+    const {allShips}=getState().toJS().game;
     ship.ships.map((ship, i) => {
       if (ship.shipId === index) {
         shipSize = ship.cellsIndex;
@@ -41,8 +43,12 @@ const destroyShip = (ship, index) => {
 
         dispatch(boatDown({shipSize, currentIndex}));
         if (!shipSize.length > 0){
+          if(allShips===1){
+            alert("Game OVER")
+          }
           dispatch(setMissNearShip(ship.cells, clearAroundShip));
-          dispatch(decementShip());}
+          dispatch(decementShip());
+        }
 
       }
       return null;
@@ -155,7 +161,6 @@ const autoGenerateShips = ship => {
       iterator++;
       randomCell = Math.floor(Math.random() * 99 + 0);
       while (fields[randomCell].status === 'empty' && counter > 0) {
-        console.log("RANDOM CELL: ", randomCell, "COUNTER: ", counter);
         let cords = cordParser(randomCell);
         tmp.cells[counter - 1] = {};
         tmp.cells[counter - 1].x = cords.x;
@@ -169,8 +174,6 @@ const autoGenerateShips = ship => {
         continue;
       break;
     }
-    console.log(iterator, "COUNT_ITERATOR");
-    console.log(tmp);
     dispatch(generateShip([tmp]));
     dispatch(incementShip());
 
@@ -183,7 +186,6 @@ const autoGenerateShips = ship => {
 
 export const actions = {
   shoot,
-  generateShip,
   runShipGenerator
 };
 
@@ -247,12 +249,10 @@ export default handleActions({
   },
   [INCREMENT_SHIP]: (state) => {
     const {allShips}=state.toJS();
-    console.log(allShips, "STATE!!!!!!!");
     return state.set('allShips', allShips+1);
   },
   [DECREMENT_SHIP]: (state) => {
     const {allShips}=state.toJS();
-    console.log(allShips, "STATE!!!!!!!");
     return state.set('allShips', allShips-1);
   }
 }, initialState);

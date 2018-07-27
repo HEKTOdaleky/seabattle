@@ -1,6 +1,6 @@
 export const  allShips = [
   {
-    shipId: 0,
+    shipId: 11,
     cellsIndex: [0, 0, 0, 0],
     cells: []
   },
