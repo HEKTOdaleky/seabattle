@@ -1,5 +1,6 @@
 import {handleActions, createAction} from 'redux-actions'
 import {fromJS} from 'immutable'
+import {allShips} from '../utils/shipArray'
 
 /*
 * Constants
@@ -10,6 +11,8 @@ const PLACED = 'PLACED';
 const BOAT_DOWN = 'BOAT_DOWN';
 const GENERATE_SHIP = 'GENERATE_SHIP';
 const STATUS_SHIP = 'STATUS_SHIP';
+
+
 
 /*
  * Actions
@@ -119,26 +122,25 @@ const generateShip = shipList => {
   }
 };
 
-const allShips = [
-  {
-    shipId: 8,
-    cellsIndex: [0, 0],
-    cells: [
 
-    ]
-  },
-];
 
-const coordParser = number => {
-  let index=number+'';
+const cordParser = number => {
+  let index = number + '';
   if (index.length === 1)
     return {x: index, y: 0};
   else
-    return {x: index.substr(1, 2), y: index.substr(0, 1)}
+    return {x: index[1], y: index[0]}
 };
 
-export const autoGenerateShips = () =>  {
-  const tmp = allShips[0];
+export const runShipGenerator = () => {
+  return dispatch => (
+    allShips.map(ship => {
+      dispatch(autoGenerateShips(ship));
+    }))
+};
+
+const autoGenerateShips = ship => {
+  const tmp = ship;
   return (dispatch, getState) => {
     let randomCell;
     let fields = getState().toJS().game.fields;
@@ -149,12 +151,12 @@ export const autoGenerateShips = () =>  {
       randomCell = Math.floor(Math.random() * 99 + 0);
       while (fields[randomCell].status === 'empty' && counter > 0) {
         console.log("RANDOM CELL: ", randomCell, "COUNTER: ", counter);
-        let cords=coordParser(randomCell);
-        tmp.cells[counter-1]={};
-        tmp.cells[counter-1].x=cords.x;
-        tmp.cells[counter-1].y=cords.y;
-        tmp.cells[counter-1].status="clean";
-        tmp.cells[counter-1].shipId=tmp.shipId;
+        let cords = cordParser(randomCell);
+        tmp.cells[counter - 1] = {};
+        tmp.cells[counter - 1].x = cords.x;
+        tmp.cells[counter - 1].y = cords.y;
+        tmp.cells[counter - 1].status = "clean";
+        tmp.cells[counter - 1].shipId = tmp.shipId;
         randomCell++;
         counter--;
       }
@@ -175,7 +177,7 @@ export const autoGenerateShips = () =>  {
 export const actions = {
   shoot,
   generateShip,
-  autoGenerateShips
+  runShipGenerator
 };
 
 
