@@ -1,15 +1,26 @@
 .App {
-  height: 200px;
-  width: 200px;
-  background: #cccccc;
+  height: 300px;
+  width: 300px;
   display: flex;
-  flex-wrap: wrap; }
+  flex-wrap: wrap;
+  padding: 60px 150px; }
+
+.back {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: url(../assets/designe/back.jpg) no-repeat center;
+  background-size: cover;
+  padding: 20px; }
 
 .field, .clean, .shot, .miss {
-  height: 18px;
-  width: 18px;
-  background: greenyellow;
-  border: 1px solid black;
+  height: 28px;
+  width: 28px;
+  background: #f4f2f2;
+  opacity: 0.65;
+  border: 1px solid blue;
   display: flex; }
   .field:hover, .clean:hover, .shot:hover, .miss:hover {
     background: yellow; }
@@ -20,10 +31,12 @@
   z-index: 1; }
 
 .shot {
-  background: red; }
+  background: url(../assets/designe/krestik.png) no-repeat center;
+  background-size: contain; }
 
 .miss {
-  background: transparent; }
+  background: url(../assets/designe/miss.png) no-repeat center;
+  background-size: contain; }
 
 .innerState {
   margin: auto;

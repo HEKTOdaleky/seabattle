@@ -1,6 +1,16 @@
 .App {
-  height: 200px;
-  width: 200px;
-  background: #cccccc;
+  height: 300px;
+  width: 300px;
   display: flex;
-  flex-wrap: wrap; }
+  flex-wrap: wrap;
+  padding: 60px 150px; }
+
+.back {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: url(../assets/designe/back.jpg) no-repeat center;
+  background-size: cover;
+  padding: 20px; }

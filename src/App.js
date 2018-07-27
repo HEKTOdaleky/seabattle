@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types'
 import connectWrapper from './store/utils/connectWrapper'
-import { rootActions } from './store/rootReducer'
+import {rootActions} from './store/rootReducer'
 import Cell from './components/Cell/Cell'
 
 export class App extends React.Component {
@@ -18,15 +18,17 @@ export class App extends React.Component {
   render() {
     const {game} = this.props.state.toJS();
     return (
-      <div className="App">
-        {game.fields.map(item => (
-          <Cell
-            key={`cell-${item.index}`}
-            cell={item}
-            onShot={this.props.actions.shoot}
-            isShip={item.shipId}
-          />
-        ))}
+      <div className="back">
+        <div className="App">
+          {game.fields.map(item => (
+            <Cell
+              key={`cell-${item.index}`}
+              cell={item}
+              onShot={this.props.actions.shoot}
+              isShip={item.shipId}
+            />
+          ))}
+        </div>
       </div>
     );
   }
