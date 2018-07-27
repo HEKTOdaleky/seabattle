@@ -29,12 +29,11 @@ const incementShip = createAction(INCREMENT_SHIP);
 const decementShip = createAction(DECREMENT_SHIP);
 
 
-
-const  destroyShip = (ship, index) => {
-  return (dispatch,getState) => {
+const destroyShip = (ship, index) => {
+  return (dispatch, getState) => {
     let shipSize;
     let currentIndex;
-    const {allShips}=getState().toJS().game;
+    const {allShips} = getState().toJS().game;
     ship.ships.map((ship, i) => {
       if (ship.shipId === index) {
         shipSize = ship.cellsIndex;
@@ -42,8 +41,8 @@ const  destroyShip = (ship, index) => {
         currentIndex = i;
 
         dispatch(boatDown({shipSize, currentIndex}));
-        if (!shipSize.length > 0){
-          if(allShips===1){
+        if (!shipSize.length > 0) {
+          if (allShips === 1) {
             alert("Game OVER")
           }
           dispatch(setMissNearShip(ship.cells, clearAroundShip));
@@ -143,6 +142,10 @@ const cordParser = number => {
     return {x: index[1], y: index[0]}
 };
 
+const random = maxNum => {
+  return Math.floor(Math.random() * maxNum + 0);
+};
+
 export const runShipGenerator = () => {
   return dispatch => (
     allShips.map(ship => {
@@ -154,20 +157,33 @@ const autoGenerateShips = ship => {
   const tmp = ship;
   return (dispatch, getState) => {
     let randomCell;
+    let randomPosition;
     let fields = getState().toJS().game.fields;
     let iterator = 0;
     while (true) {
       let counter = tmp.cellsIndex.length;
       iterator++;
-      randomCell = Math.floor(Math.random() * 99 + 0);
-      while (fields[randomCell].status === 'empty' && counter > 0) {
+      randomCell = random(99);
+      randomPosition = random(2);
+
+      while (randomCell < 100 && fields[randomCell].status === 'empty' && counter > 0) {
         let cords = cordParser(randomCell);
         tmp.cells[counter - 1] = {};
         tmp.cells[counter - 1].x = cords.x;
         tmp.cells[counter - 1].y = cords.y;
         tmp.cells[counter - 1].status = "clean";
         tmp.cells[counter - 1].shipId = tmp.shipId;
-        randomCell++;
+        switch (randomPosition) {
+          case 1:
+            randomCell++;
+            break;
+          case 0:
+            randomCell += 10;
+            break;
+          default:
+            randomCell++;
+
+        }
         counter--;
       }
       if (counter > 0)
@@ -176,7 +192,6 @@ const autoGenerateShips = ship => {
     }
     dispatch(generateShip([tmp]));
     dispatch(incementShip());
-
 
 
   }
@@ -248,11 +263,11 @@ export default handleActions({
       }))
   },
   [INCREMENT_SHIP]: (state) => {
-    const {allShips}=state.toJS();
-    return state.set('allShips', allShips+1);
+    const {allShips} = state.toJS();
+    return state.set('allShips', allShips + 1);
   },
   [DECREMENT_SHIP]: (state) => {
-    const {allShips}=state.toJS();
-    return state.set('allShips', allShips-1);
+    const {allShips} = state.toJS();
+    return state.set('allShips', allShips - 1);
   }
 }, initialState);
