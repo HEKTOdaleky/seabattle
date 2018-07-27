@@ -121,32 +121,40 @@ const generateShip = shipList => {
 
 const allShips = [
   {
-    shipId: 1,
+    shipId: 8,
     cellsIndex: [0, 0],
     cells: [
-      {
-        status: 'clean',
-        shipId: 1
-      },
-      {
-        status: 'clean',
-        shipId: 1
-      }
+
     ]
   },
 ];
 
-export const autoGenerateShips = () => {
+const coordParser = number => {
+  let index=number+'';
+  if (index.length === 1)
+    return {x: index, y: 0};
+  else
+    return {x: index.substr(1, 2), y: index.substr(0, 1)}
+};
+
+export const autoGenerateShips = () =>  {
+  const tmp = allShips[0];
   return (dispatch, getState) => {
     let randomCell;
     let fields = getState().toJS().game.fields;
     let iterator = 0;
     while (true) {
-      let counter = 3;
+      let counter = tmp.cellsIndex.length;
       iterator++;
       randomCell = Math.floor(Math.random() * 99 + 0);
       while (fields[randomCell].status === 'empty' && counter > 0) {
         console.log("RANDOM CELL: ", randomCell, "COUNTER: ", counter);
+        let cords=coordParser(randomCell);
+        tmp.cells[counter-1]={};
+        tmp.cells[counter-1].x=cords.x;
+        tmp.cells[counter-1].y=cords.y;
+        tmp.cells[counter-1].status="clean";
+        tmp.cells[counter-1].shipId=tmp.shipId;
         randomCell++;
         counter--;
       }
@@ -155,6 +163,8 @@ export const autoGenerateShips = () => {
       break;
     }
     console.log(iterator, "COUNT_ITERATOR");
+    console.log(tmp);
+    dispatch(generateShip([tmp]));
 
 
   }
