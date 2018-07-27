@@ -96,6 +96,7 @@ export class App extends React.Component {
         ]
       }];
     this.props.actions.generateShip(ship);
+    this.props.actions.autoGenerateShips();
   }
 
   render() {

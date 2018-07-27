@@ -34,7 +34,7 @@ const destroyShip = (ship, index) => {
 
         dispatch(boatDown({shipSize, currentIndex}));
         if (!shipSize.length > 0)
-          dispatch(setMissNearShip(ship.cells,clearAroundShip))
+          dispatch(setMissNearShip(ship.cells, clearAroundShip))
       }
       return null;
 
@@ -42,7 +42,7 @@ const destroyShip = (ship, index) => {
 
   }
 };
-const setMissNearShip = (ship,callback) => {
+const setMissNearShip = (ship, callback) => {
 
   return dispatch => (
     ship.map(cell => {
@@ -50,7 +50,7 @@ const setMissNearShip = (ship,callback) => {
         for (let y = -1; y < 2; y++) {
           let xPosition = cell.x - x;
           let yPosition = cell.y - y;
-          if (xPosition < 0 || yPosition < 0||xPosition > 9 || yPosition > 9)
+          if (xPosition < 0 || yPosition < 0 || xPosition > 9 || yPosition > 9)
             continue;
           else
             dispatch(callback(Number.parseInt(yPosition + '' + xPosition)));
@@ -81,7 +81,7 @@ export const clearAroundShip = index => {
     const {game} = getState().toJS();
     const currentCell = game.fields[index];
 
-    if (currentCell.status==='empty'||currentCell.status==='placed') {
+    if (currentCell.status === 'empty' || currentCell.status === 'placed') {
       dispatch(miss(index));
     }
 
@@ -94,7 +94,7 @@ export const placedAroundShip = index => {
     const {game} = getState().toJS();
     const currentCell = game.fields[index];
 
-    if (currentCell.status==='empty') {
+    if (currentCell.status === 'empty') {
       dispatch(placed(index));
     }
 
@@ -118,9 +118,54 @@ const generateShip = shipList => {
 
   }
 };
+
+const allShips = [
+  {
+    shipId: 1,
+    cellsIndex: [0, 0],
+    cells: [
+      {
+        status: 'clean',
+        shipId: 1
+      },
+      {
+        status: 'clean',
+        shipId: 1
+      }
+    ]
+  },
+];
+
+export const autoGenerateShips = () => {
+  return (dispatch, getState) => {
+    let randomCell;
+    let fields = getState().toJS().game.fields;
+    let iterator = 0;
+    while (true) {
+      let counter = 3;
+      iterator++;
+      randomCell = Math.floor(Math.random() * 99 + 0);
+      while (fields[randomCell].status === 'empty' && counter > 0) {
+        console.log("RANDOM CELL: ", randomCell, "COUNTER: ", counter);
+        randomCell++;
+        counter--;
+      }
+      if (counter > 0)
+        continue;
+      break;
+    }
+    console.log(iterator, "COUNT_ITERATOR");
+
+
+  }
+
+};
+
+
 export const actions = {
   shoot,
-  generateShip
+  generateShip,
+  autoGenerateShips
 };
 
 
