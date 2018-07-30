@@ -5,25 +5,23 @@ import {allShips} from '../utils/shipArray'
 /*
 * Constants
 * */
-const SHOT = 'SHOT';
-const MISS = 'MISS';
-const PLACED = 'PLACED';
+const SHOT = 'shot';
+const MISS = 'miss';
+const PLACED = 'placed';
 const BOAT_DOWN = 'BOAT_DOWN';
 const GENERATE_SHIP = 'GENERATE_SHIP';
 const STATUS_SHIP = 'STATUS_SHIP';
 const INCREMENT_SHIP = 'INCREMENT_SHIP';
 const DECREMENT_SHIP = 'DECREMENT_SHIP';
 
+const SHIP_ACTION = 'SHIP_ACTION';
+
 
 /*
  * Actions
  * */
-export const shot = createAction(SHOT, cell => cell);
-export const miss = createAction(MISS, cell => cell);
-export const placed = createAction(PLACED, cell => cell);
-export const shipAction = createAction(action => action, cell => cell);
-
-export const boatDown = createAction(BOAT_DOWN, ship => ship);
+const shipAction = createAction(SHIP_ACTION, cell => cell);
+const boatDown = createAction(BOAT_DOWN, ship => ship);
 const setShip = createAction(GENERATE_SHIP, ship => ship);
 const statusShip = createAction(STATUS_SHIP, ship => ship);
 const incementShip = createAction(INCREMENT_SHIP);
@@ -84,11 +82,12 @@ export const shoot = index => {
     const currentCell = game.fields[index];
 
     if (currentCell.shipId) {
-      dispatch(shot(index));
+      dispatch(shipAction({index, status: SHOT}));
       dispatch(destroyShip(game, currentCell.shipId));
     }
     else
-      dispatch(miss(index));
+      dispatch(shipAction({index, status: MISS}));
+
 
   }
 };
@@ -98,7 +97,7 @@ export const clearAroundShip = index => {
     const currentCell = game.fields[index];
 
     if (currentCell.status === 'empty' || currentCell.status === 'placed') {
-      dispatch(miss(index));
+      dispatch(shipAction({index, status: MISS}));
     }
 
 
@@ -111,7 +110,8 @@ export const placedAroundShip = index => {
     const currentCell = game.fields[index];
 
     if (currentCell.status === 'empty') {
-      dispatch(placed(index));
+      dispatch(shipAction({index, status: PLACED}));
+
     }
 
 
@@ -245,17 +245,10 @@ export default handleActions({
     return state.update('ships', entry => entry.push(payload))
   },
 
-  [SHOT]: (state, {payload}) => {
-    return state.updateIn(['fields', payload], entry => entry
-      .set('status', 'shot'))
-  },
-  [MISS]: (state, {payload}) => {
-    return state.updateIn(['fields', payload], entry => entry
-      .set('status', 'miss'))
-  },
-  [PLACED]: (state, {payload}) => {
-    return state.updateIn(['fields', payload], entry => entry
-      .set('status', 'placed'))
+  [SHIP_ACTION]: (state, payload) => {
+    const {index, status} = payload.payload;
+    return state.updateIn(['fields', index], entry => entry
+      .set('status', status))
   },
   [BOAT_DOWN]: (state, {payload}) => {
     const {shipSize, currentIndex} = payload;
