@@ -21,6 +21,7 @@ const DECREMENT_SHIP = 'DECREMENT_SHIP';
 export const shot = createAction(SHOT, cell => cell);
 export const miss = createAction(MISS, cell => cell);
 export const placed = createAction(PLACED, cell => cell);
+export const shipAction = createAction(action => action, cell => cell);
 
 export const boatDown = createAction(BOAT_DOWN, ship => ship);
 const setShip = createAction(GENERATE_SHIP, ship => ship);
@@ -67,10 +68,11 @@ const setMissNearShip = (ship, callback) => {
           if (xPosition < 0 || yPosition < 0 || xPosition > 9 || yPosition > 9)
             continue;
           else
-            dispatch(callback(Number.parseInt(yPosition + '' + xPosition)));
+            dispatch(callback(Number.parseInt(yPosition + '' + xPosition, 10)));
 
         }
       }
+      return null;
 
 
     }))
@@ -123,11 +125,12 @@ const generateShip = shipList => {
       dispatch(setMissNearShip(ship.cells, placedAroundShip));
 
       ship.cells.map(cell => {
-        const index = Number.parseInt(cell.y + '' + cell.x);
+        const index = Number.parseInt(cell.y + '' + cell.x, 10);
         cell.index = index;
         dispatch(setShip(cell));
-
+        return null;
       });
+      return null;
     });
 
   }
@@ -150,6 +153,7 @@ export const runShipGenerator = () => {
   return dispatch => (
     allShips.map(ship => {
       dispatch(autoGenerateShips(ship));
+      return true;
     }))
 };
 
@@ -159,10 +163,8 @@ const autoGenerateShips = ship => {
     let randomCell;
     let randomPosition;
     let fields = getState().toJS().game.fields;
-    let iterator = 0;
     while (true) {
       let counter = tmp.cellsIndex.length;
-      iterator++;
       randomCell = random(99);
       randomPosition = random(2);
 
