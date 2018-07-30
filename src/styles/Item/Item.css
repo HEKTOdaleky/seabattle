@@ -15,9 +15,11 @@
 
 .shot {
   background: url(../assets/designe/krestik.png) no-repeat center;
+  opacity: 1;
   background-size: contain; }
 
 .miss {
+  opacity: 1;
   background: url(../assets/designe/miss.png) no-repeat center;
   background-size: contain; }
 
