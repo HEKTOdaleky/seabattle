@@ -13,10 +13,7 @@ const GENERATE_SHIP = 'GENERATE_SHIP';
 const STATUS_SHIP = 'STATUS_SHIP';
 const INCREMENT_SHIP = 'INCREMENT_SHIP';
 const DECREMENT_SHIP = 'DECREMENT_SHIP';
-
 const SHIP_ACTION = 'SHIP_ACTION';
-
-
 /*
  * Actions
  * */
@@ -26,8 +23,10 @@ const setShip = createAction(GENERATE_SHIP, ship => ship);
 const statusShip = createAction(STATUS_SHIP, ship => ship);
 const incementShip = createAction(INCREMENT_SHIP);
 const decementShip = createAction(DECREMENT_SHIP);
-
-
+/*
+ * Methods
+ * */
+/*Checks if the ship is alive*/
 const destroyShip = (ship, index) => {
   return (dispatch, getState) => {
     let shipSize;
@@ -38,7 +37,6 @@ const destroyShip = (ship, index) => {
         shipSize = ship.cellsIndex;
         shipSize.length = shipSize.length - 1;
         currentIndex = i;
-
         dispatch(boatDown({shipSize, currentIndex}));
         if (!shipSize.length > 0) {
           if (allShips === 1) {
@@ -47,16 +45,13 @@ const destroyShip = (ship, index) => {
           dispatch(setMissNearShip(ship.cells, clearAroundShip));
           dispatch(decementShip());
         }
-
       }
       return null;
-
     });
-
   }
 };
+/*If ship down, set miss around ship*/
 const setMissNearShip = (ship, callback) => {
-
   return dispatch => (
     ship.map(cell => {
       for (let x = -1; x < 2; x++) {
@@ -67,30 +62,25 @@ const setMissNearShip = (ship, callback) => {
             continue;
           else
             dispatch(callback(Number.parseInt(yPosition + '' + xPosition, 10)));
-
         }
       }
       return null;
-
-
     }))
-
 };
+
 export const shoot = index => {
   return (dispatch, getState) => {
     const {game} = getState().toJS();
     const currentCell = game.fields[index];
-
     if (currentCell.shipId) {
       dispatch(shipAction({index, status: SHOT}));
       dispatch(destroyShip(game, currentCell.shipId));
     }
     else
       dispatch(shipAction({index, status: MISS}));
-
-
   }
 };
+/*set placed cells around ship*/
 export const clearAroundShip = index => {
   return (dispatch, getState) => {
     const {game} = getState().toJS();
@@ -99,22 +89,17 @@ export const clearAroundShip = index => {
     if (currentCell.status === 'empty' || currentCell.status === 'placed') {
       dispatch(shipAction({index, status: MISS}));
     }
-
-
   }
 };
 
+/*set placed cells around ship*/
 export const placedAroundShip = index => {
   return (dispatch, getState) => {
     const {game} = getState().toJS();
     const currentCell = game.fields[index];
-
     if (currentCell.status === 'empty') {
       dispatch(shipAction({index, status: PLACED}));
-
     }
-
-
   }
 };
 
@@ -123,7 +108,6 @@ const generateShip = shipList => {
     shipList.map(ship => {
       dispatch(statusShip(ship));
       dispatch(setMissNearShip(ship.cells, placedAroundShip));
-
       ship.cells.map(cell => {
         const index = Number.parseInt(cell.y + '' + cell.x, 10);
         cell.index = index;
@@ -132,11 +116,9 @@ const generateShip = shipList => {
       });
       return null;
     });
-
   }
 };
-
-
+/*parse index to x,y cords*/
 const cordParser = number => {
   let index = number + '';
   if (index.length === 1)
@@ -167,7 +149,6 @@ const autoGenerateShips = ship => {
       let counter = tmp.cellsIndex.length;
       randomCell = random(99);
       randomPosition = random(2);
-
       while (randomCell < 100 && fields[randomCell].status === 'empty' && counter > 0) {
         let cords = cordParser(randomCell);
         tmp.cells[counter - 1] = {};
@@ -184,7 +165,6 @@ const autoGenerateShips = ship => {
             break;
           default:
             randomCell++;
-
         }
         counter--;
       }
@@ -194,24 +174,13 @@ const autoGenerateShips = ship => {
     }
     dispatch(generateShip([tmp]));
     dispatch(incementShip());
-
-
   }
-
 };
-
-
-export const actions = {
-  shoot,
-  runShipGenerator
-};
-
 
 const generateField = () => {
   const cells = [];
   let y = 0;
   let x = 0;
-
   for (let i = 0; i < 100; i++) {
     x += 1;
     if (i % 10 === 0) {
@@ -221,8 +190,12 @@ const generateField = () => {
     // status can be: empty, miss, placed, shot
     cells.push({x, y, index: i, status: 'empty'});
   }
-
   return cells;
+};
+
+export const actions = {
+  shoot,
+  runShipGenerator
 };
 
 export const initialState = fromJS({
@@ -240,11 +213,9 @@ export default handleActions({
         x, y, status: 'placed', shipId
       }))
   },
-
   [STATUS_SHIP]: (state, {payload}) => {
     return state.update('ships', entry => entry.push(payload))
   },
-
   [SHIP_ACTION]: (state, payload) => {
     const {index, status} = payload.payload;
     return state.updateIn(['fields', index], entry => entry
