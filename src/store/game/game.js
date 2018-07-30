@@ -102,22 +102,6 @@ export const placedAroundShip = index => {
     }
   }
 };
-
-const generateShip = shipList => {
-  return dispatch => {
-    shipList.map(ship => {
-      dispatch(statusShip(ship));
-      dispatch(setMissNearShip(ship.cells, placedAroundShip));
-      ship.cells.map(cell => {
-        const index = Number.parseInt(cell.y + '' + cell.x, 10);
-        cell.index = index;
-        dispatch(setShip(cell));
-        return null;
-      });
-      return null;
-    });
-  }
-};
 /*parse index to x,y cords*/
 const cordParser = number => {
   let index = number + '';
@@ -130,7 +114,7 @@ const cordParser = number => {
 const random = maxNum => {
   return Math.floor(Math.random() * maxNum);
 };
-
+/*1. Start ship builder for all Ships array.*/
 export const runShipGenerator = () => {
   return dispatch => (
     allShips.map(ship => {
@@ -138,7 +122,7 @@ export const runShipGenerator = () => {
       return true;
     }))
 };
-
+/*2. Generate ships on empty fields. Accepts one ship from array (1). If all correct, call Generator */
 const autoGenerateShips = ship => {
   const tmp = ship;
   return (dispatch, getState) => {
@@ -172,11 +156,26 @@ const autoGenerateShips = ship => {
         continue;
       break;
     }
-    dispatch(generateShip([tmp]));
+    dispatch(generateShip(tmp));
     dispatch(incementShip());
   }
 };
+/*3. Takes one ship and create shipObject for ships in reducer */
+const generateShip = ship => {
+  return dispatch => {
+    dispatch(statusShip(ship));
+    dispatch(setMissNearShip(ship.cells, placedAroundShip));
+    ship.cells.map(cell => {
+      const index = Number.parseInt(cell.y + '' + cell.x, 10);
+      cell.index = index;
+      dispatch(setShip(cell));
+      return null;
+    });
+    return null;
 
+  }
+};
+/*Generate cells object for battle ground*/
 const generateField = () => {
   const cells = [];
   let y = 0;
