@@ -128,7 +128,7 @@ const cordParser = number => {
 };
 
 const random = maxNum => {
-  return Math.floor(Math.random() * maxNum + 0);
+  return Math.floor(Math.random() * maxNum);
 };
 
 export const runShipGenerator = () => {
@@ -200,6 +200,7 @@ export const actions = {
 
 export const initialState = fromJS({
   fields: generateField(),
+  fieldsMy: generateField(),
   ships: [],
   allShips: 0
 
