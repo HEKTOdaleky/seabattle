@@ -29,6 +29,16 @@ export class App extends React.Component {
             />
           ))}
         </div>
+        <div className="App">
+          {game.fieldsComp.map(item => (
+            <Cell
+              key={`cell-${item.index}`}
+              cell={item}
+              onShot={()=>alert(`Hi ${item.status}`)}
+              isShip={item.shipId}
+            />
+          ))}
+        </div>
 
       </div>
     );

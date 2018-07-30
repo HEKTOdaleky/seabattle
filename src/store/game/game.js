@@ -14,6 +14,9 @@ const STATUS_SHIP = 'STATUS_SHIP';
 const INCREMENT_SHIP = 'INCREMENT_SHIP';
 const DECREMENT_SHIP = 'DECREMENT_SHIP';
 const SHIP_ACTION = 'SHIP_ACTION';
+
+const MY_FIELDS='fields';
+const COMP_FIELDS='fieldsComp';
 /*
  * Actions
  * */
@@ -199,8 +202,10 @@ export const actions = {
 
 export const initialState = fromJS({
   fields: generateField(),
-  fieldsMy: generateField(),
+  fieldsComp: generateField(),
   ships: [],
+  shipsComp:[],
+  allShipsComp:0,
   allShips: 0
 
 });
