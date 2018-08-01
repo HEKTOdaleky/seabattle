@@ -11,12 +11,15 @@ const PLACED = 'placed';
 const BOAT_DOWN = 'BOAT_DOWN';
 const GENERATE_SHIP = 'GENERATE_SHIP';
 const STATUS_SHIP = 'STATUS_SHIP';
+const STATUS_SHIP_COMP = 'STATUS_SHIP_COMP';
 const INCREMENT_SHIP = 'INCREMENT_SHIP';
 const DECREMENT_SHIP = 'DECREMENT_SHIP';
 const SHIP_ACTION = 'SHIP_ACTION';
 
-const MY_FIELDS='fields';
-const COMP_FIELDS='fieldsComp';
+const MY_FIELDS = 'fields';
+const COMP_FIELDS = 'fieldsComp';
+const ALL_SHIPS_COMP = "allShipsComp";
+const ALL_SHIPS = "allShips";
 /*
  * Actions
  * */
@@ -24,7 +27,9 @@ const shipAction = createAction(SHIP_ACTION, cell => cell);
 const boatDown = createAction(BOAT_DOWN, ship => ship);
 const setShip = createAction(GENERATE_SHIP, ship => ship);
 const statusShip = createAction(STATUS_SHIP, ship => ship);
-const incementShip = createAction(INCREMENT_SHIP);
+const statusShipComp = createAction(STATUS_SHIP_COMP, ship => ship);
+
+const incementShip = createAction(INCREMENT_SHIP,field=>field);
 const decementShip = createAction(DECREMENT_SHIP);
 /*
  * Methods
@@ -119,21 +124,27 @@ const random = maxNum => {
 };
 /*1. Start ship builder for all Ships array.*/
 export const runShipGenerator = () => {
-  return dispatch => (
-    allShips.map(ship => {
-      dispatch(autoGenerateShips(ship));
+  return dispatch => {
+    allShips.map((ship, index) => {
+      if (index < 10)
+        dispatch(autoGenerateShips(ship, MY_FIELDS));
+      else
+        dispatch(autoGenerateShips(ship, COMP_FIELDS));
+
       return true;
-    }))
+    });
+  }
 };
 /*2. Generate ships on empty fields. Accepts one ship from array (1). If all correct, call Generator */
-const autoGenerateShips = ship => {
-  const tmp = ship;
+let autoGenerateShips = (ship, fieldsName) => {
+  let tmp;
   return (dispatch, getState) => {
     let randomCell;
     let randomPosition;
-    let fields = getState().toJS().game.fields;
+    let fields = getState().toJS().game[fieldsName];
     while (true) {
-      let counter = tmp.cellsIndex.length;
+      tmp = ship;
+      let counter = ship.cellsIndex.length;
       randomCell = random(99);
       randomPosition = random(2);
       while (randomCell < 100 && fields[randomCell].status === 'empty' && counter > 0) {
@@ -159,18 +170,25 @@ const autoGenerateShips = ship => {
         continue;
       break;
     }
-    dispatch(generateShip(tmp));
-    dispatch(incementShip());
+
+    dispatch(generateShip(tmp, fieldsName));
+    let fieldForIncrement=ALL_SHIPS;
+    if (fieldsName === 'fieldsComp')
+      fieldForIncrement=ALL_SHIPS_COMP;
+    dispatch(incementShip(fieldForIncrement));
   }
 };
+
 /*3. Takes one ship and create shipObject for ships in reducer */
-const generateShip = ship => {
+const generateShip = (ship, name) => {
   return dispatch => {
-    dispatch(statusShip(ship));
+    name === 'fieldsComp' ? dispatch(statusShipComp(ship)) : dispatch(statusShip(ship));
     dispatch(setMissNearShip(ship.cells, placedAroundShip));
+
     ship.cells.map(cell => {
       const index = Number.parseInt(cell.y + '' + cell.x, 10);
       cell.index = index;
+      cell.field=name;
       dispatch(setShip(cell));
       return null;
     });
@@ -204,22 +222,25 @@ export const initialState = fromJS({
   fields: generateField(),
   fieldsComp: generateField(),
   ships: [],
-  shipsComp:[],
-  allShipsComp:0,
+  shipsComp: [],
+  allShipsComp: 0,
   allShips: 0
 
 });
 
 export default handleActions({
   [GENERATE_SHIP]: (state, {payload}) => {
-    const {x, y, index, shipId} = payload;
-    return state.updateIn(['fields', `${index}`], entry =>
+    const {x, y, index, shipId,field} = payload;
+    return state.updateIn([field, `${index}`], entry =>
       entry.merge({
         x, y, status: 'placed', shipId
       }))
   },
   [STATUS_SHIP]: (state, {payload}) => {
     return state.update('ships', entry => entry.push(payload))
+  },
+  [STATUS_SHIP_COMP]: (state, {payload}) => {
+    return state.update('shipsComp', entry => entry.push(payload))
   },
   [SHIP_ACTION]: (state, payload) => {
     const {index, status} = payload.payload;
@@ -233,9 +254,9 @@ export default handleActions({
         currentIndex: shipSize
       }))
   },
-  [INCREMENT_SHIP]: (state) => {
+  [INCREMENT_SHIP]: (state,{payload}) => {
     const {allShips} = state.toJS();
-    return state.set('allShips', allShips + 1);
+    return state.set(payload, allShips + 1);
   },
   [DECREMENT_SHIP]: (state) => {
     const {allShips} = state.toJS();

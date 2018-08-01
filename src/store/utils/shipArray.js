@@ -45,4 +45,50 @@ export const  allShips = [
     cellsIndex: [0],
     cells: []
   },
+  {
+    shipId: 31,
+    cellsIndex: [0, 0, 0, 0],
+    cells: []
+  },
+  {
+    shipId: 21,
+    cellsIndex: [0, 0, 0],
+    cells: []
+  },
+  {
+    shipId: 22,
+    cellsIndex: [0, 0, 0],
+    cells: []
+  },
+  {
+    shipId: 23,
+    cellsIndex: [0, 0],
+    cells: []
+  },
+  {
+    shipId: 24,
+    cellsIndex: [0, 0],
+    cells: []
+  },
+  {
+    shipId: 25,
+    cellsIndex: [0, 0],
+    cells: []
+  },{
+    shipId: 26,
+    cellsIndex: [0],
+    cells: []
+  },{
+    shipId: 27,
+    cellsIndex: [0],
+    cells: []
+  },{
+    shipId: 28,
+    cellsIndex: [0],
+    cells: []
+  },{
+    shipId: 29,
+    cellsIndex: [0],
+    cells: []
+  },
 ];
