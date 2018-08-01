@@ -15,6 +15,9 @@ const STATUS_SHIP_COMP = 'STATUS_SHIP_COMP';
 const INCREMENT_SHIP = 'INCREMENT_SHIP';
 const DECREMENT_SHIP = 'DECREMENT_SHIP';
 const SHIP_ACTION = 'SHIP_ACTION';
+const SHIP_SHOOT = 'SHIP_SHOOT';
+
+
 
 const MY_FIELDS = 'fields';
 const COMP_FIELDS = 'fieldsComp';
@@ -24,22 +27,24 @@ const ALL_SHIPS = "allShips";
  * Actions
  * */
 const shipAction = createAction(SHIP_ACTION, cell => cell);
+const shipShoot= createAction(SHIP_SHOOT, cell => cell);
+
 const boatDown = createAction(BOAT_DOWN, ship => ship);
 const setShip = createAction(GENERATE_SHIP, ship => ship);
 const statusShip = createAction(STATUS_SHIP, ship => ship);
 const statusShipComp = createAction(STATUS_SHIP_COMP, ship => ship);
 
 const incementShip = createAction(INCREMENT_SHIP,field=>field);
-const decementShip = createAction(DECREMENT_SHIP);
+const decementShip = createAction(DECREMENT_SHIP,field=>field);
 /*
  * Methods
  * */
 /*Checks if the ship is alive*/
-const destroyShip = (ship, index) => {
+const destroyShip = (ship, index,type,field) => {
   return (dispatch, getState) => {
     let shipSize;
     let currentIndex;
-    const {allShips} = getState().toJS().game;
+    const allShips = getState().toJS().game[type];
     ship.ships.map((ship, i) => {
       if (ship.shipId === index) {
         shipSize = ship.cellsIndex;
@@ -50,8 +55,8 @@ const destroyShip = (ship, index) => {
           if (allShips === 1) {
             alert("Game OVER")
           }
-          dispatch(setMissNearShip(ship.cells, clearAroundShip));
-          dispatch(decementShip());
+          dispatch(setMissNearShip(ship.cells, clearAroundShip,field));
+          dispatch(decementShip(type));
         }
       }
       return null;
@@ -59,7 +64,7 @@ const destroyShip = (ship, index) => {
   }
 };
 /*If ship down, set miss around ship*/
-const setMissNearShip = (ship, callback) => {
+const setMissNearShip = (ship, callback,field) => {
   return dispatch => (
     ship.map(cell => {
       for (let x = -1; x < 2; x++) {
@@ -69,7 +74,7 @@ const setMissNearShip = (ship, callback) => {
           if (xPosition < 0 || yPosition < 0 || xPosition > 9 || yPosition > 9)
             continue;
           else
-            dispatch(callback(Number.parseInt(yPosition + '' + xPosition, 10)));
+            dispatch(callback(Number.parseInt(yPosition + '' + xPosition, 10),field));
         }
       }
       return null;
@@ -81,21 +86,34 @@ export const shoot = index => {
     const {game} = getState().toJS();
     const currentCell = game.fields[index];
     if (currentCell.shipId) {
-      dispatch(shipAction({index, status: SHOT}));
-      dispatch(destroyShip(game, currentCell.shipId));
+      dispatch(shipShoot({index, status: SHOT,field:MY_FIELDS}));
+      dispatch(destroyShip(game, currentCell.shipId,ALL_SHIPS,MY_FIELDS));
     }
     else
-      dispatch(shipAction({index, status: MISS}));
+      dispatch(shipShoot({index, status: MISS,field:MY_FIELDS}));
+  }
+};
+
+export const shootComp = index => {
+  return (dispatch, getState) => {
+    const {game} = getState().toJS();
+    const currentCell = game.fieldsComp[index];
+    if (currentCell.shipId) {
+      dispatch(shipShoot({index, status: SHOT,field:COMP_FIELDS}));
+      dispatch(destroyShip(game, currentCell.shipId,ALL_SHIPS_COMP,COMP_FIELDS));
+    }
+    else
+      dispatch(shipShoot({index, status: MISS,field:COMP_FIELDS}));
   }
 };
 /*set placed cells around ship*/
-export const clearAroundShip = index => {
+export const clearAroundShip = (index,field) => {
   return (dispatch, getState) => {
     const {game} = getState().toJS();
     const currentCell = game.fields[index];
 
     if (currentCell.status === 'empty' || currentCell.status === 'placed') {
-      dispatch(shipAction({index, status: MISS}));
+      dispatch(shipShoot({index, status: MISS,field}));
     }
   }
 };
@@ -215,6 +233,7 @@ const generateField = () => {
 
 export const actions = {
   shoot,
+  shootComp,
   runShipGenerator
 };
 
@@ -247,6 +266,12 @@ export default handleActions({
     return state.updateIn(['fields', index], entry => entry
       .set('status', status))
   },
+  [SHIP_SHOOT]: (state, payload) => {
+    const {index, status,field} = payload.payload;
+    console.log(payload);
+    return state.updateIn([`${field}`, index], entry => entry
+      .set('status', status))
+  },
   [BOAT_DOWN]: (state, {payload}) => {
     const {shipSize, currentIndex} = payload;
     return state.updateIn(['fields', `${currentIndex}`], entry =>
@@ -255,11 +280,12 @@ export default handleActions({
       }))
   },
   [INCREMENT_SHIP]: (state,{payload}) => {
-    const {allShips} = state.toJS();
+    console.log(payload);
+    const allShips = state.toJS()[payload];
     return state.set(payload, allShips + 1);
   },
-  [DECREMENT_SHIP]: (state) => {
+  [DECREMENT_SHIP]: (state,{payload}) => {
     const {allShips} = state.toJS();
-    return state.set('allShips', allShips - 1);
+    return state.set(payload, allShips - 1);
   }
 }, initialState);

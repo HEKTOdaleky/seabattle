@@ -24,7 +24,7 @@ export class App extends React.Component {
             <Cell
               key={`cell-${item.index}`}
               cell={item}
-              onShot={this.props.actions.shoot}
+              onShot={()=>this.props.actions.shoot(item.index)}
               isShip={item.shipId}
             />
           ))}
@@ -34,7 +34,7 @@ export class App extends React.Component {
             <Cell
               key={`cell-${item.index}`}
               cell={item}
-              onShot={()=>alert(`Hi ${item.status}`)}
+              onShot={()=>this.props.actions.shootComp(item.index)}
               isShip={item.shipId}
             />
           ))}
