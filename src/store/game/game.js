@@ -26,7 +26,6 @@ const ALL_SHIPS = "allShips";
 /*
  * Actions
  * */
-const shipAction = createAction(SHIP_ACTION, cell => cell);
 const shipShoot= createAction(SHIP_SHOOT, cell => cell);
 
 const boatDown = createAction(BOAT_DOWN, ship => ship);
@@ -50,7 +49,7 @@ const destroyShip = (ship, index,type,field) => {
         shipSize = ship.cellsIndex;
         shipSize.length = shipSize.length - 1;
         currentIndex = i;
-        dispatch(boatDown({shipSize, currentIndex}));
+        dispatch(boatDown({shipSize, currentIndex,field}));
         if (!shipSize.length > 0) {
           if (allShips === 1) {
             alert("Game OVER")
@@ -119,12 +118,12 @@ export const clearAroundShip = (index,field) => {
 };
 
 /*set placed cells around ship*/
-export const placedAroundShip = index => {
+export const placedAroundShip = (index,field) => {
   return (dispatch, getState) => {
     const {game} = getState().toJS();
     const currentCell = game.fields[index];
     if (currentCell.status === 'empty') {
-      dispatch(shipAction({index, status: PLACED}));
+      dispatch(shipShoot({index, status: PLACED,field}));
     }
   }
 };
@@ -201,7 +200,7 @@ let autoGenerateShips = (ship, fieldsName) => {
 const generateShip = (ship, name) => {
   return dispatch => {
     name === 'fieldsComp' ? dispatch(statusShipComp(ship)) : dispatch(statusShip(ship));
-    dispatch(setMissNearShip(ship.cells, placedAroundShip));
+    dispatch(setMissNearShip(ship.cells, placedAroundShip,name));
 
     ship.cells.map(cell => {
       const index = Number.parseInt(cell.y + '' + cell.x, 10);
@@ -261,11 +260,6 @@ export default handleActions({
   [STATUS_SHIP_COMP]: (state, {payload}) => {
     return state.update('shipsComp', entry => entry.push(payload))
   },
-  [SHIP_ACTION]: (state, payload) => {
-    const {index, status} = payload.payload;
-    return state.updateIn(['fields', index], entry => entry
-      .set('status', status))
-  },
   [SHIP_SHOOT]: (state, payload) => {
     const {index, status,field} = payload.payload;
     console.log(payload);
@@ -273,8 +267,8 @@ export default handleActions({
       .set('status', status))
   },
   [BOAT_DOWN]: (state, {payload}) => {
-    const {shipSize, currentIndex} = payload;
-    return state.updateIn(['fields', `${currentIndex}`], entry =>
+    const {shipSize, currentIndex,field} = payload;
+    return state.updateIn([field, `${currentIndex}`], entry =>
       entry.merge({
         currentIndex: shipSize
       }))
