@@ -14,7 +14,6 @@ const STATUS_SHIP = 'STATUS_SHIP';
 const STATUS_SHIP_COMP = 'STATUS_SHIP_COMP';
 const INCREMENT_SHIP = 'INCREMENT_SHIP';
 const DECREMENT_SHIP = 'DECREMENT_SHIP';
-const SHIP_ACTION = 'SHIP_ACTION';
 const SHIP_SHOOT = 'SHIP_SHOOT';
 
 
@@ -72,8 +71,9 @@ const setMissNearShip = (ship, callback,field) => {
           let yPosition = cell.y - y;
           if (xPosition < 0 || yPosition < 0 || xPosition > 9 || yPosition > 9)
             continue;
-          else
-            dispatch(callback(Number.parseInt(yPosition + '' + xPosition, 10),field));
+          else{
+            console.log(Number.parseInt(yPosition + '' + xPosition, 10),field);
+            dispatch(callback(Number.parseInt(yPosition + '' + xPosition, 10),field));}
         }
       }
       return null;
@@ -110,7 +110,6 @@ export const clearAroundShip = (index,field) => {
   return (dispatch, getState) => {
     const {game} = getState().toJS();
     const currentCell = game.fields[index];
-
     if (currentCell.status === 'empty' || currentCell.status === 'placed') {
       dispatch(shipShoot({index, status: MISS,field}));
     }
@@ -262,7 +261,6 @@ export default handleActions({
   },
   [SHIP_SHOOT]: (state, payload) => {
     const {index, status,field} = payload.payload;
-    console.log(payload);
     return state.updateIn([`${field}`, index], entry => entry
       .set('status', status))
   },
@@ -274,7 +272,6 @@ export default handleActions({
       }))
   },
   [INCREMENT_SHIP]: (state,{payload}) => {
-    console.log(payload);
     const allShips = state.toJS()[payload];
     return state.set(payload, allShips + 1);
   },
