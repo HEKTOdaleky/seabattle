@@ -22,6 +22,8 @@ const MY_FIELDS = 'fields';
 const COMP_FIELDS = 'fieldsComp';
 const ALL_SHIPS_COMP = "allShipsComp";
 const ALL_SHIPS = "allShips";
+const SHIP_USER= 'ships';
+const SHIP_COMP = 'shipsComp';
 /*
  * Actions
  * */
@@ -38,14 +40,16 @@ const decementShip = createAction(DECREMENT_SHIP,field=>field);
  * Methods
  * */
 /*Checks if the ship is alive*/
-const destroyShip = (ship, index,type,field) => {
+const destroyShip = (ship, index,type,field,array) => {
   return (dispatch, getState) => {
     let shipSize;
     let currentIndex;
     const allShips = getState().toJS().game[type];
-    ship.ships.map((ship, i) => {
+    const currentShipArray= ship[array];
+    currentShipArray.map((ship, i) => {
       if (ship.shipId === index) {
         shipSize = ship.cellsIndex;
+        console.log(shipSize);
         shipSize.length = shipSize.length - 1;
         currentIndex = i;
         dispatch(boatDown({shipSize, currentIndex,field}));
@@ -85,7 +89,7 @@ export const shoot = index => {
     const currentCell = game.fields[index];
     if (currentCell.shipId) {
       dispatch(shipShoot({index, status: SHOT,field:MY_FIELDS}));
-      dispatch(destroyShip(game, currentCell.shipId,ALL_SHIPS,MY_FIELDS));
+      dispatch(destroyShip(game, currentCell.shipId,ALL_SHIPS,MY_FIELDS,SHIP_USER));
     }
     else
       dispatch(shipShoot({index, status: MISS,field:MY_FIELDS}));
@@ -98,7 +102,7 @@ export const shootComp = index => {
     const currentCell = game.fieldsComp[index];
     if (currentCell.shipId) {
       dispatch(shipShoot({index, status: SHOT,field:COMP_FIELDS}));
-      dispatch(destroyShip(game, currentCell.shipId,ALL_SHIPS_COMP,COMP_FIELDS));
+      dispatch(destroyShip(game, currentCell.shipId,ALL_SHIPS_COMP,COMP_FIELDS,SHIP_COMP));
     }
     else
       dispatch(shipShoot({index, status: MISS,field:COMP_FIELDS}));
@@ -108,7 +112,8 @@ export const shootComp = index => {
 export const clearAroundShip = (index,field) => {
   return (dispatch, getState) => {
     const {game} = getState().toJS();
-    const currentCell = game.fields[index];
+    const allFields= game[field];
+    const currentCell = allFields[index];
     if (currentCell.status === 'empty' || currentCell.status === 'placed') {
       dispatch(shipShoot({index, status: MISS,field}));
     }
