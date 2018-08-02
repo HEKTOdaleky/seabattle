@@ -114,6 +114,11 @@ export const shootComp = () => {
     if (game.queue)
       return;
     const currentCell = game.fieldsComp[index];
+    if(currentCell.status==='miss'||currentCell.status==='shot'){
+      dispatch(shootComp());
+      return;
+    }
+
     if(!currentCell.shipId)
       dispatch(changeQueue());
 
