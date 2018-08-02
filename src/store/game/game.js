@@ -63,7 +63,7 @@ const destroyShip = (ship, index,type,field) => {
 };
 /*If ship down, set miss around ship*/
 const setMissNearShip = (ship, callback,field) => {
-  return dispatch => (
+  return dispatch => {
     ship.map(cell => {
       for (let x = -1; x < 2; x++) {
         for (let y = -1; y < 2; y++) {
@@ -72,12 +72,11 @@ const setMissNearShip = (ship, callback,field) => {
           if (xPosition < 0 || yPosition < 0 || xPosition > 9 || yPosition > 9)
             continue;
           else{
-            console.log(Number.parseInt(yPosition + '' + xPosition, 10),field);
             dispatch(callback(Number.parseInt(yPosition + '' + xPosition, 10),field));}
         }
       }
       return null;
-    }))
+    })}
 };
 
 export const shoot = index => {
@@ -120,7 +119,8 @@ export const clearAroundShip = (index,field) => {
 export const placedAroundShip = (index,field) => {
   return (dispatch, getState) => {
     const {game} = getState().toJS();
-    const currentCell = game.fields[index];
+    const allFields= game[field];
+    const currentCell = allFields[index];
     if (currentCell.status === 'empty') {
       dispatch(shipShoot({index, status: PLACED,field}));
     }
