@@ -1,11 +1,14 @@
-.App {
+.App, .AppUser {
   height: 300px;
   width: 300px;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: wrap; }
+
+.ground {
   padding: 60px 150px; }
 
 .back {
+  display: flex;
   position: absolute;
   top: 0;
   bottom: 0;

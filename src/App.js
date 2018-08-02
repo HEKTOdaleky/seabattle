@@ -19,6 +19,8 @@ export class App extends React.Component {
     const {game} = this.props.state.toJS();
     return (
       <div className="back">
+        <div className="ground">
+          <h1>Поле врага</h1>
         <div className="App">
           {game.fields.map(item => (
             <Cell
@@ -29,7 +31,10 @@ export class App extends React.Component {
             />
           ))}
         </div>
-        <div className="App">
+        </div>
+        <div className="ground">
+          <h1>Ваше поле</h1>
+        <div className="AppUser">
           {game.fieldsComp.map(item => (
             <Cell
               key={`cell-${item.index}`}
@@ -38,6 +43,7 @@ export class App extends React.Component {
               isShip={item.shipId}
             />
           ))}
+        </div>
         </div>
 
       </div>

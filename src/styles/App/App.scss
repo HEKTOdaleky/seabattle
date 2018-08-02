@@ -3,10 +3,17 @@
   width: 300px;
   display: flex;
   flex-wrap: wrap;
+}
+.ground{
   padding: 60px 150px;
+
+}
+.AppUser{
+  @extend .App
 }
 
 .back{
+  display: flex;
   position: absolute;
   top:0;
   bottom: 0;
