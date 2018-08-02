@@ -8,7 +8,6 @@ import {allShips} from '../utils/shipArray'
 const SHOT = 'shot';
 const MISS = 'miss';
 const PLACED = 'placed';
-const PLACED_S = 'placeds';
 const BOAT_DOWN = 'BOAT_DOWN';
 const GENERATE_SHIP = 'GENERATE_SHIP';
 const STATUS_SHIP = 'STATUS_SHIP';
@@ -59,7 +58,13 @@ const destroyShip = (ship, index, type, field, array) => {
         dispatch(boatDown({shipSize, currentIndex, field}));
         if (!shipSize.length > 0) {
           if (allShips === 1) {
-            alert("Game OVER")
+            if(type==="allShips"){
+              alert("Поздравляю!!! Вы победили")
+            }
+            else {
+              alert("К сожалению вы проиграли... Следующий раз обязательно повезет!")
+
+            }
           }
           dispatch(setMissNearShip(ship.cells, clearAroundShip, field));
           dispatch(decementShip(type));
@@ -94,6 +99,8 @@ export const shoot = (index, quote) => {
     if (!quote)
       return null;
     const {game} = getState().toJS();
+    if(game.allShipsComp===0)
+      return
     const currentCell = game.fields[index];
     if(!currentCell.shipId)
       dispatch(changeQueue());
