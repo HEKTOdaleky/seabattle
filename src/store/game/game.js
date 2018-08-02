@@ -49,9 +49,9 @@ const destroyShip = (ship, index,type,field,array) => {
     currentShipArray.map((ship, i) => {
       if (ship.shipId === index) {
         shipSize = ship.cellsIndex;
-        console.log(shipSize);
         shipSize.length = shipSize.length - 1;
         currentIndex = i;
+
         dispatch(boatDown({shipSize, currentIndex,field}));
         if (!shipSize.length > 0) {
           if (allShips === 1) {
@@ -281,7 +281,8 @@ export default handleActions({
     return state.set(payload, allShips + 1);
   },
   [DECREMENT_SHIP]: (state,{payload}) => {
-    const {allShips} = state.toJS();
+    console.log(payload)
+    const allShips = state.toJS()[payload];
     return state.set(payload, allShips - 1);
   }
 }, initialState);
