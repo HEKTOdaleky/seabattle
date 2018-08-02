@@ -24,7 +24,7 @@ export class App extends React.Component {
             <Cell
               key={`cell-${item.index}`}
               cell={item}
-              onShot={()=>this.props.actions.shoot(item.index)}
+              onShot={()=>this.props.actions.shoot(item.index,game.queue)}
               isShip={item.shipId}
             />
           ))}
@@ -34,7 +34,7 @@ export class App extends React.Component {
             <Cell
               key={`cell-${item.index}`}
               cell={item}
-              onShot={()=>this.props.actions.shootComp(item.index)}
+              onShot={()=>this.props.actions.shootComp(item.index,game.queue)}
               isShip={item.shipId}
             />
           ))}

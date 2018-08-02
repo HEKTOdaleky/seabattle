@@ -15,6 +15,7 @@ const STATUS_SHIP_COMP = 'STATUS_SHIP_COMP';
 const INCREMENT_SHIP = 'INCREMENT_SHIP';
 const DECREMENT_SHIP = 'DECREMENT_SHIP';
 const SHIP_SHOOT = 'SHIP_SHOOT';
+const CHANGE_QUEUE = 'CHANGE_QUEUE';
 
 
 
@@ -22,42 +23,44 @@ const MY_FIELDS = 'fields';
 const COMP_FIELDS = 'fieldsComp';
 const ALL_SHIPS_COMP = "allShipsComp";
 const ALL_SHIPS = "allShips";
-const SHIP_USER= 'ships';
+const SHIP_USER = 'ships';
 const SHIP_COMP = 'shipsComp';
 /*
  * Actions
  * */
-const shipShoot= createAction(SHIP_SHOOT, cell => cell);
+const shipShoot = createAction(SHIP_SHOOT, cell => cell);
 
 const boatDown = createAction(BOAT_DOWN, ship => ship);
 const setShip = createAction(GENERATE_SHIP, ship => ship);
 const statusShip = createAction(STATUS_SHIP, ship => ship);
 const statusShipComp = createAction(STATUS_SHIP_COMP, ship => ship);
 
-const incementShip = createAction(INCREMENT_SHIP,field=>field);
-const decementShip = createAction(DECREMENT_SHIP,field=>field);
+const incementShip = createAction(INCREMENT_SHIP, field => field);
+const decementShip = createAction(DECREMENT_SHIP, field => field);
+const changeQueue = createAction(CHANGE_QUEUE);
+
 /*
  * Methods
  * */
 /*Checks if the ship is alive*/
-const destroyShip = (ship, index,type,field,array) => {
+const destroyShip = (ship, index, type, field, array) => {
   return (dispatch, getState) => {
     let shipSize;
     let currentIndex;
     const allShips = getState().toJS().game[type];
-    const currentShipArray= ship[array];
+    const currentShipArray = ship[array];
     currentShipArray.map((ship, i) => {
       if (ship.shipId === index) {
         shipSize = ship.cellsIndex;
         shipSize.length = shipSize.length - 1;
         currentIndex = i;
 
-        dispatch(boatDown({shipSize, currentIndex,field}));
+        dispatch(boatDown({shipSize, currentIndex, field}));
         if (!shipSize.length > 0) {
           if (allShips === 1) {
             alert("Game OVER")
           }
-          dispatch(setMissNearShip(ship.cells, clearAroundShip,field));
+          dispatch(setMissNearShip(ship.cells, clearAroundShip, field));
           dispatch(decementShip(type));
         }
       }
@@ -66,7 +69,7 @@ const destroyShip = (ship, index,type,field,array) => {
   }
 };
 /*If ship down, set miss around ship*/
-const setMissNearShip = (ship, callback,field) => {
+const setMissNearShip = (ship, callback, field) => {
   return dispatch => {
     ship.map(cell => {
       for (let x = -1; x < 2; x++) {
@@ -75,59 +78,70 @@ const setMissNearShip = (ship, callback,field) => {
           let yPosition = cell.y - y;
           if (xPosition < 0 || yPosition < 0 || xPosition > 9 || yPosition > 9)
             continue;
-          else{
-            dispatch(callback(Number.parseInt(yPosition + '' + xPosition, 10),field));}
+          else {
+            dispatch(callback(Number.parseInt(yPosition + '' + xPosition, 10), field));
+          }
         }
       }
       return null;
-    })}
+    })
+  }
 };
 
-export const shoot = index => {
+export const shoot = (index, quote) => {
   return (dispatch, getState) => {
+    if (!quote)
+      return null;
     const {game} = getState().toJS();
     const currentCell = game.fields[index];
+    if(!currentCell.shipId)
+      dispatch(changeQueue());
     if (currentCell.shipId) {
-      dispatch(shipShoot({index, status: SHOT,field:MY_FIELDS}));
-      dispatch(destroyShip(game, currentCell.shipId,ALL_SHIPS,MY_FIELDS,SHIP_USER));
+      dispatch(shipShoot({index, status: SHOT, field: MY_FIELDS}));
+      dispatch(destroyShip(game, currentCell.shipId, ALL_SHIPS, MY_FIELDS, SHIP_USER));
     }
     else
-      dispatch(shipShoot({index, status: MISS,field:MY_FIELDS}));
+      dispatch(shipShoot({index, status: MISS, field: MY_FIELDS}));
   }
 };
 
-export const shootComp = index => {
+export const shootComp = (index, quote) => {
   return (dispatch, getState) => {
+    if (quote)
+      return;
     const {game} = getState().toJS();
     const currentCell = game.fieldsComp[index];
+    if(!currentCell.shipId)
+      dispatch(changeQueue());
+
     if (currentCell.shipId) {
-      dispatch(shipShoot({index, status: SHOT,field:COMP_FIELDS}));
-      dispatch(destroyShip(game, currentCell.shipId,ALL_SHIPS_COMP,COMP_FIELDS,SHIP_COMP));
+      dispatch(shipShoot({index, status: SHOT, field: COMP_FIELDS}));
+      dispatch(destroyShip(game, currentCell.shipId, ALL_SHIPS_COMP, COMP_FIELDS, SHIP_COMP));
     }
     else
-      dispatch(shipShoot({index, status: MISS,field:COMP_FIELDS}));
+      dispatch(shipShoot({index, status: MISS, field: COMP_FIELDS}));
   }
 };
 /*set placed cells around ship*/
-export const clearAroundShip = (index,field) => {
+export const clearAroundShip = (index, field) => {
   return (dispatch, getState) => {
     const {game} = getState().toJS();
-    const allFields= game[field];
+    const allFields = game[field];
     const currentCell = allFields[index];
     if (currentCell.status === 'empty' || currentCell.status === 'placed') {
-      dispatch(shipShoot({index, status: MISS,field}));
+      dispatch(shipShoot({index, status: MISS, field}));
     }
   }
 };
 
 /*set placed cells around ship*/
-export const placedAroundShip = (index,field) => {
+export const placedAroundShip = (index, field) => {
   return (dispatch, getState) => {
     const {game} = getState().toJS();
-    const allFields= game[field];
+    const allFields = game[field];
     const currentCell = allFields[index];
     if (currentCell.status === 'empty') {
-      dispatch(shipShoot({index, status: PLACED,field}));
+      dispatch(shipShoot({index, status: PLACED, field}));
     }
   }
 };
@@ -193,9 +207,9 @@ let autoGenerateShips = (ship, fieldsName) => {
     }
 
     dispatch(generateShip(tmp, fieldsName));
-    let fieldForIncrement=ALL_SHIPS;
+    let fieldForIncrement = ALL_SHIPS;
     if (fieldsName === 'fieldsComp')
-      fieldForIncrement=ALL_SHIPS_COMP;
+      fieldForIncrement = ALL_SHIPS_COMP;
     dispatch(incementShip(fieldForIncrement));
   }
 };
@@ -204,12 +218,12 @@ let autoGenerateShips = (ship, fieldsName) => {
 const generateShip = (ship, name) => {
   return dispatch => {
     name === 'fieldsComp' ? dispatch(statusShipComp(ship)) : dispatch(statusShip(ship));
-    dispatch(setMissNearShip(ship.cells, placedAroundShip,name));
+    dispatch(setMissNearShip(ship.cells, placedAroundShip, name));
 
     ship.cells.map(cell => {
       const index = Number.parseInt(cell.y + '' + cell.x, 10);
       cell.index = index;
-      cell.field=name;
+      cell.field = name;
       dispatch(setShip(cell));
       return null;
     });
@@ -246,13 +260,14 @@ export const initialState = fromJS({
   ships: [],
   shipsComp: [],
   allShipsComp: 0,
-  allShips: 0
+  allShips: 0,
+  queue: true
 
 });
 
 export default handleActions({
   [GENERATE_SHIP]: (state, {payload}) => {
-    const {x, y, index, shipId,field} = payload;
+    const {x, y, index, shipId, field} = payload;
     return state.updateIn([field, `${index}`], entry =>
       entry.merge({
         x, y, status: 'placed', shipId
@@ -265,24 +280,27 @@ export default handleActions({
     return state.update('shipsComp', entry => entry.push(payload))
   },
   [SHIP_SHOOT]: (state, payload) => {
-    const {index, status,field} = payload.payload;
+    const {index, status, field} = payload.payload;
     return state.updateIn([`${field}`, index], entry => entry
       .set('status', status))
   },
   [BOAT_DOWN]: (state, {payload}) => {
-    const {shipSize, currentIndex,field} = payload;
+    const {shipSize, currentIndex, field} = payload;
     return state.updateIn([field, `${currentIndex}`], entry =>
       entry.merge({
         currentIndex: shipSize
       }))
   },
-  [INCREMENT_SHIP]: (state,{payload}) => {
+  [INCREMENT_SHIP]: (state, {payload}) => {
     const allShips = state.toJS()[payload];
     return state.set(payload, allShips + 1);
   },
-  [DECREMENT_SHIP]: (state,{payload}) => {
-    console.log(payload)
+  [DECREMENT_SHIP]: (state, {payload}) => {
     const allShips = state.toJS()[payload];
     return state.set(payload, allShips - 1);
+  },
+  [CHANGE_QUEUE]: (state) => {
+    const current = state.toJS();
+    return state.set('queue',!current.queue);
   }
 }, initialState);
