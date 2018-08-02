@@ -102,14 +102,17 @@ export const shoot = (index, quote) => {
     }
     else
       dispatch(shipShoot({index, status: MISS, field: MY_FIELDS}));
+
+    setTimeout(dispatch(shootComp(),1000))
   }
 };
 
-export const shootComp = (index, quote) => {
+export const shootComp = () => {
   return (dispatch, getState) => {
-    if (quote)
-      return;
+    let index=random(99);
     const {game} = getState().toJS();
+    if (game.queue)
+      return;
     const currentCell = game.fieldsComp[index];
     if(!currentCell.shipId)
       dispatch(changeQueue());
@@ -120,6 +123,7 @@ export const shootComp = (index, quote) => {
     }
     else
       dispatch(shipShoot({index, status: MISS, field: COMP_FIELDS}));
+    dispatch(shootComp())
   }
 };
 /*set placed cells around ship*/
