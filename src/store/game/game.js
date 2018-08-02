@@ -8,6 +8,7 @@ import {allShips} from '../utils/shipArray'
 const SHOT = 'shot';
 const MISS = 'miss';
 const PLACED = 'placed';
+const PLACED_S = 'placeds';
 const BOAT_DOWN = 'BOAT_DOWN';
 const GENERATE_SHIP = 'GENERATE_SHIP';
 const STATUS_SHIP = 'STATUS_SHIP';
@@ -279,7 +280,7 @@ export default handleActions({
     const {x, y, index, shipId, field} = payload;
     return state.updateIn([field, `${index}`], entry =>
       entry.merge({
-        x, y, status: 'placed', shipId
+        x, y, status: 'placed placed_s', shipId
       }))
   },
   [STATUS_SHIP]: (state, {payload}) => {

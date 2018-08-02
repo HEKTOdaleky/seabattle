@@ -1,11 +1,11 @@
-.field, .clean, .shot, .miss {
+.field, .clean, .shot, .miss, .AppUser .placed_s {
   height: 28px;
   width: 28px;
   background: #f4f2f2;
   opacity: 0.65;
   border: 1px solid blue;
   display: flex; }
-  .field:hover, .clean:hover, .shot:hover, .miss:hover {
+  .field:hover, .clean:hover, .shot:hover, .miss:hover, .AppUser .placed_s:hover {
     background: yellow; }
 
 .clean {
@@ -26,3 +26,8 @@
 .innerState {
   margin: auto;
   z-index: 1; }
+
+.AppUser .placed_s {
+  opacity: 1;
+  background: url(../assets/designe/ship.png) no-repeat center;
+  background-size: contain; }

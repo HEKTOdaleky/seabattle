@@ -37,4 +37,9 @@
   margin: auto;
   z-index: 1;
 }
-
+.AppUser .placed_s{
+  @extend .field;
+  opacity: 1;
+  background: url(../assets/designe/ship.png) no-repeat center;
+  background-size: contain
+}
