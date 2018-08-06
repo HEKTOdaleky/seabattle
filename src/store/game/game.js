@@ -163,7 +163,7 @@ export const placedAroundShip = (index, field) => {
 };
 /*parse index to x,y cords*/
 const cordParser = number => {
-  console.log(number,"Parser")
+  console.log(number, "Parser")
   let index = number + '';
   switch (index.length) {
     case 1:
@@ -171,9 +171,9 @@ const cordParser = number => {
     case 2:
       return {x: index[1], y: index[0]};
     case 3:
-      return {x: index.substr(0, 2), y: index[3]};
+      return {x: index[3], y: index.substr(0, 1)};
     case 4:
-      return {x: index.substr(0, 2), y: index[3]};
+      return {x: index.substr(2), y: index.substr(0, 1)};
     default:
       alert("Ошибка!")
   }
