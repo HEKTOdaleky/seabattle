@@ -79,14 +79,14 @@ const setMissNearShip = (ship, callback, field, size) => {
   return dispatch => {
     ship.map(cell => {
       let index =cell.y * 10 + cell.x;
-      console.log(index, "INDEX");
       for(let i=-1;i<2;i++){
         for(let k=-1;k<2;k++){
           let num=size*i+k;
           let newIndex=num+index;
-          if (newIndex < 0 ||  newIndex>Math.pow(size,2))
+          if (newIndex < 0 ||  newIndex>Math.pow(size,2)-1)
                   continue;
                 else {
+                  console.log(newIndex,field)
                   dispatch(callback(newIndex, field));
                 }
 
@@ -94,25 +94,6 @@ const setMissNearShip = (ship, callback, field, size) => {
       }
       return null;
     })
-
-    // ship.map(cell => {
-    //
-    //   for (let x = -1; x < 2; x++) {
-    //     for (let y = -1; y < 2; y++) {
-    //       let xPosition = cell.x - x;
-    //       let yPosition = cell.y - y;
-    //       console.log(cell, yPosition * 10 + xPosition);
-    //       if (xPosition < 0 || yPosition < 0 || xPosition > size - 1 || yPosition > size - 1)
-    //         continue;
-    //       else {
-    //         let toDispatchIndex = yPosition * 10 + xPosition;
-    //         dispatch(callback(toDispatchIndex, field));
-    //       }
-    //     }
-    //   }
-    //   return null;
-    // })
-
   }
 };
 
@@ -122,7 +103,7 @@ export const shoot = (index, quote) => {
       return null;
     const {game} = getState().toJS();
     if (game.allShipsComp === 0)
-      return
+      return;
     const currentCell = game.fields[index];
     if (!currentCell.shipId)
       dispatch(changeQueue());
@@ -296,9 +277,10 @@ export const actions = {
 };
 
 export const initialState = fromJS({
-  userSize: 12,
-  fields: generateField(12),
-  fieldsComp: generateField(12),
+  /*Рамеры поля (все 3 числа должны быть одинаковые 0_о )*/
+  userSize: 15,
+  fields: generateField(15),
+  fieldsComp: generateField(15),
   ships: [],
   shipsComp: [],
   allShipsComp: 0,
