@@ -18,7 +18,6 @@ const SHIP_SHOOT = 'SHIP_SHOOT';
 const CHANGE_QUEUE = 'CHANGE_QUEUE';
 
 
-
 const MY_FIELDS = 'fields';
 const COMP_FIELDS = 'fieldsComp';
 const ALL_SHIPS_COMP = "allShipsComp";
@@ -58,7 +57,7 @@ const destroyShip = (ship, index, type, field, array) => {
         dispatch(boatDown({shipSize, currentIndex, field}));
         if (!shipSize.length > 0) {
           if (allShips === 1) {
-            if(type==="allShips"){
+            if (type === "allShips") {
               alert("Поздравляю!!! Вы победили")
             }
             else {
@@ -99,10 +98,10 @@ export const shoot = (index, quote) => {
     if (!quote)
       return null;
     const {game} = getState().toJS();
-    if(game.allShipsComp===0)
+    if (game.allShipsComp === 0)
       return
     const currentCell = game.fields[index];
-    if(!currentCell.shipId)
+    if (!currentCell.shipId)
       dispatch(changeQueue());
     if (currentCell.shipId) {
       dispatch(shipShoot({index, status: SHOT, field: MY_FIELDS}));
@@ -111,23 +110,23 @@ export const shoot = (index, quote) => {
     else
       dispatch(shipShoot({index, status: MISS, field: MY_FIELDS}));
 
-    setTimeout(dispatch(shootComp(),1000))
+    setTimeout(dispatch(shootComp(), 1000))
   }
 };
 
 export const shootComp = () => {
   return (dispatch, getState) => {
-    let index=random(99);
+    let index = random(99);
     const {game} = getState().toJS();
     if (game.queue)
       return;
     const currentCell = game.fieldsComp[index];
-    if(currentCell.status==='miss'||currentCell.status==='shot'){
+    if (currentCell.status === 'miss' || currentCell.status === 'shot') {
       dispatch(shootComp());
       return;
     }
 
-    if(!currentCell.shipId)
+    if (!currentCell.shipId)
       dispatch(changeQueue());
 
     if (currentCell.shipId) {
@@ -164,14 +163,20 @@ export const placedAroundShip = (index, field) => {
 };
 /*parse index to x,y cords*/
 const cordParser = number => {
+  console.log(number,"Parser")
   let index = number + '';
-     switch (index.length){
-      case 1:
-        return {x: index, y: 0};
-      case 2:
-        return {x: index[1], y: index[0]};
-      default: alert("ЖОПА!")
-    }
+  switch (index.length) {
+    case 1:
+      return {x: index, y: 0};
+    case 2:
+      return {x: index[1], y: index[0]};
+    case 3:
+      return {x: index.substr(0, 2), y: index[3]};
+    case 4:
+      return {x: index.substr(0, 2), y: index[3]};
+    default:
+      alert("Ошибка!")
+  }
 };
 
 const random = maxNum => {
@@ -253,13 +258,13 @@ const generateShip = (ship, name) => {
   }
 };
 /*Generate cells object for battle ground*/
-const generateField = () => {
+const generateField = (size) => {
   const cells = [];
   let y = 0;
   let x = 0;
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < Math.pow(size,2); i++) {
     x += 1;
-    if (i % 10 === 0) {
+    if (i % size === 0) {
       y += 1;
       x = 0;
     }
@@ -276,8 +281,8 @@ export const actions = {
 };
 
 export const initialState = fromJS({
-  fields: generateField(),
-  fieldsComp: generateField(),
+  fields: generateField(10),
+  fieldsComp: generateField(10),
   ships: [],
   shipsComp: [],
   allShipsComp: 0,
@@ -322,6 +327,6 @@ export default handleActions({
   },
   [CHANGE_QUEUE]: (state) => {
     const current = state.toJS();
-    return state.set('queue',!current.queue);
+    return state.set('queue', !current.queue);
   }
 }, initialState);
