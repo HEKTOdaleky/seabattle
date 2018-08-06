@@ -158,10 +158,13 @@ export const placedAroundShip = (index, field) => {
 /*parse index to x,y cords*/
 const cordParser = number => {
   let index = number + '';
-  if (index.length === 1)
-    return {x: index, y: 0};
-  else
-    return {x: index[1], y: index[0]}
+     switch (index.length){
+      case 1:
+        return {x: index, y: 0};
+      case 2:
+        return {x: index[1], y: index[0]};
+      default: alert("ЖОПА!")
+    }
 };
 
 const random = maxNum => {
