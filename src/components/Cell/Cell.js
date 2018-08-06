@@ -29,7 +29,7 @@ export default class Cell extends React.Component {
       [status]: status
     });
     return (
-      <div className={cellClassnames} onClick={this.shot}>
+      <div name ={this.props.cell.index}  className={cellClassnames} onClick={this.shot}>
       </div>
     )
   }

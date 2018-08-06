@@ -21,7 +21,7 @@ export class App extends React.Component {
       <div className="back">
         <div className="ground">
           <h1>Поле врага</h1>
-        <div className="App" style={{width:`${30*12}px`}}>
+        <div className="App" style={{width:`${30*game.userSize}px`}}>
           {game.fields.map(item => (
             <Cell
               key={`cell-${item.index}`}
@@ -34,7 +34,7 @@ export class App extends React.Component {
         </div>
         <div className="ground">
           <h1>Ваше поле</h1>
-        <div className="AppUser">
+        <div className="AppUser" style={{width:`${30*game.userSize}px`}}>
           {game.fieldsComp.map(item => (
             <Cell
               key={`cell-${item.index}`}

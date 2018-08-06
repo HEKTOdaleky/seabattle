@@ -47,6 +47,7 @@ const destroyShip = (ship, index, type, field, array) => {
     let shipSize;
     let currentIndex;
     const allShips = getState().toJS().game[type];
+    const size = getState().toJS().game.userSize;
     const currentShipArray = ship[array];
     currentShipArray.map((ship, i) => {
       if (ship.shipId === index) {
@@ -65,7 +66,7 @@ const destroyShip = (ship, index, type, field, array) => {
 
             }
           }
-          dispatch(setMissNearShip(ship.cells, clearAroundShip, field));
+          dispatch(setMissNearShip(ship.cells, clearAroundShip, field, size));
           dispatch(decementShip(type));
         }
       }
@@ -74,22 +75,44 @@ const destroyShip = (ship, index, type, field, array) => {
   }
 };
 /*If ship down, set miss around ship*/
-const setMissNearShip = (ship, callback, field) => {
+const setMissNearShip = (ship, callback, field, size) => {
   return dispatch => {
     ship.map(cell => {
-      for (let x = -1; x < 2; x++) {
-        for (let y = -1; y < 2; y++) {
-          let xPosition = cell.x - x;
-          let yPosition = cell.y - y;
-          if (xPosition < 0 || yPosition < 0 || xPosition > 9 || yPosition > 9)
-            continue;
-          else {
-            dispatch(callback(Number.parseInt(yPosition + '' + xPosition, 10), field));
-          }
+      let index =cell.y * 10 + cell.x;
+      console.log(index, "INDEX");
+      for(let i=-1;i<2;i++){
+        for(let k=-1;k<2;k++){
+          let num=size*i+k;
+          let newIndex=num+index;
+          if (newIndex < 0 ||  newIndex>Math.pow(size,2))
+                  continue;
+                else {
+                  dispatch(callback(newIndex, field));
+                }
+
         }
       }
       return null;
     })
+
+    // ship.map(cell => {
+    //
+    //   for (let x = -1; x < 2; x++) {
+    //     for (let y = -1; y < 2; y++) {
+    //       let xPosition = cell.x - x;
+    //       let yPosition = cell.y - y;
+    //       console.log(cell, yPosition * 10 + xPosition);
+    //       if (xPosition < 0 || yPosition < 0 || xPosition > size - 1 || yPosition > size - 1)
+    //         continue;
+    //       else {
+    //         let toDispatchIndex = yPosition * 10 + xPosition;
+    //         dispatch(callback(toDispatchIndex, field));
+    //       }
+    //     }
+    //   }
+    //   return null;
+    // })
+
   }
 };
 
@@ -116,8 +139,9 @@ export const shoot = (index, quote) => {
 
 export const shootComp = () => {
   return (dispatch, getState) => {
-    let index = random(99);
     const {game} = getState().toJS();
+
+    let index = random(Math.pow(game.userSize, 2) - 1);
     if (game.queue)
       return;
     const currentCell = game.fieldsComp[index];
@@ -192,12 +216,13 @@ let autoGenerateShips = (ship, fieldsName) => {
     let randomCell;
     let randomPosition;
     let fields = getState().toJS().game[fieldsName];
+    let size = getState().toJS().game.userSize;
     while (true) {
       tmp = ship;
       let counter = ship.cellsIndex.length;
-      randomCell = random(99);
+      randomCell = random(Math.pow(size, 2) - 1);
       randomPosition = random(2);
-      while (randomCell < 100 && fields[randomCell].status === 'empty' && counter > 0) {
+      while (randomCell < Math.pow(size, 2) && fields[randomCell].status === 'empty' && counter > 0) {
         let cords = cordParser(randomCell);
         randomPosition = random(2);
         tmp.cells[counter - 1] = {};
@@ -210,7 +235,7 @@ let autoGenerateShips = (ship, fieldsName) => {
             randomCell++;
             break;
           case 0:
-            randomCell += 10;
+            randomCell += size;
             break;
           default:
             randomCell++;
@@ -222,7 +247,7 @@ let autoGenerateShips = (ship, fieldsName) => {
       break;
     }
 
-    dispatch(generateShip(tmp, fieldsName));
+    dispatch(generateShip(tmp, fieldsName, size));
     let fieldForIncrement = ALL_SHIPS;
     if (fieldsName === 'fieldsComp')
       fieldForIncrement = ALL_SHIPS_COMP;
@@ -231,13 +256,13 @@ let autoGenerateShips = (ship, fieldsName) => {
 };
 
 /*3. Takes one ship and create shipObject for ships in reducer */
-const generateShip = (ship, name) => {
+const generateShip = (ship, name, size) => {
   return dispatch => {
     name === 'fieldsComp' ? dispatch(statusShipComp(ship)) : dispatch(statusShip(ship));
-    dispatch(setMissNearShip(ship.cells, placedAroundShip, name));
+    dispatch(setMissNearShip(ship.cells, placedAroundShip, name, size));
 
     ship.cells.map(cell => {
-      const index = Number.parseInt(cell.y + '' + cell.x, 10);
+      const index = cell.y * 10 + cell.x;
       cell.index = index;
       cell.field = name;
       dispatch(setShip(cell));
@@ -271,8 +296,9 @@ export const actions = {
 };
 
 export const initialState = fromJS({
+  userSize: 12,
   fields: generateField(12),
-  fieldsComp: generateField(10),
+  fieldsComp: generateField(12),
   ships: [],
   shipsComp: [],
   allShipsComp: 0,
