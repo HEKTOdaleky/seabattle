@@ -194,6 +194,7 @@ let autoGenerateShips = (ship, fieldsName) => {
       randomPosition = random(2);
       while (randomCell < 100 && fields[randomCell].status === 'empty' && counter > 0) {
         let cords = cordParser(randomCell);
+        randomPosition = random(2);
         tmp.cells[counter - 1] = {};
         tmp.cells[counter - 1].x = cords.x;
         tmp.cells[counter - 1].y = cords.y;
