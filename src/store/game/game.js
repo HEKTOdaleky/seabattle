@@ -162,21 +162,11 @@ export const placedAroundShip = (index, field) => {
   }
 };
 /*parse index to x,y cords*/
-const cordParser = number => {
-  console.log(number, "Parser")
-  let index = number + '';
-  switch (index.length) {
-    case 1:
-      return {x: index, y: 0};
-    case 2:
-      return {x: index[1], y: index[0]};
-    case 3:
-      return {x: index[3], y: index.substr(0, 1)};
-    case 4:
-      return {x: index.substr(2), y: index.substr(0, 1)};
-    default:
-      alert("Ошибка!")
-  }
+const cordParser = (number, size = 10) => {
+  const tmpNum = number / size;
+  let y = Math.trunc(tmpNum);
+  let x = number - y * size;
+  return {x, y};
 };
 
 const random = maxNum => {
@@ -262,7 +252,7 @@ const generateField = (size) => {
   const cells = [];
   let y = 0;
   let x = 0;
-  for (let i = 0; i < Math.pow(size,2); i++) {
+  for (let i = 0; i < Math.pow(size, 2); i++) {
     x += 1;
     if (i % size === 0) {
       y += 1;
