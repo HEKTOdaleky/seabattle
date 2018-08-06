@@ -271,7 +271,7 @@ export const actions = {
 };
 
 export const initialState = fromJS({
-  fields: generateField(10),
+  fields: generateField(12),
   fieldsComp: generateField(10),
   ships: [],
   shipsComp: [],

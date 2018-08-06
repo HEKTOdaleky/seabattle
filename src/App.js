@@ -21,7 +21,7 @@ export class App extends React.Component {
       <div className="back">
         <div className="ground">
           <h1>Поле врага</h1>
-        <div className="App">
+        <div className="App" style={{width:`${30*12}px`}}>
           {game.fields.map(item => (
             <Cell
               key={`cell-${item.index}`}
