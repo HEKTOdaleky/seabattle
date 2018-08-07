@@ -315,18 +315,18 @@ export default handleActions({
     },
     [INCREMENT_SHIP]:
       (state, {payload}) => {
-        const allShips = state.toJS()[payload];
+        const allShips = state.get(payload);
         return state.set(payload, allShips + 1);
       },
     [DECREMENT_SHIP]:
       (state, {payload}) => {
-        const allShips = state.toJS()[payload];
+        const allShips = state.get(payload);
         return state.set(payload, allShips - 1);
       },
     [CHANGE_QUEUE]:
       (state) => {
-        const current = state.toJS();
-        return state.set('queue', !current.queue);
+        const current = state.get('queue');
+        return state.set('queue', !current);
       },
     [GENERATE_CELLS]:
       (state, {payload}) => {
