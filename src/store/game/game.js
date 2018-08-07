@@ -17,8 +17,7 @@ const DECREMENT_SHIP = 'DECREMENT_SHIP';
 const SHIP_SHOOT = 'SHIP_SHOOT';
 const CHANGE_QUEUE = 'CHANGE_QUEUE';
 const GENERATE_CELLS = 'GENERATE_CELLS';
-
-
+const GROUND_SIZE = 'GROUND_SIZE';
 const MY_FIELDS = 'fields';
 const COMP_FIELDS = 'fieldsComp';
 const ALL_SHIPS_COMP = "allShipsComp";
@@ -34,11 +33,10 @@ const boatDown = createAction(BOAT_DOWN, ship => ship);
 const setShip = createAction(GENERATE_SHIP, ship => ship);
 const statusShip = createAction(STATUS_SHIP, ship => ship);
 const statusShipComp = createAction(STATUS_SHIP_COMP, ship => ship);
-
+const setGroundSize = createAction(GROUND_SIZE, size => size);
 const incementShip = createAction(INCREMENT_SHIP, field => field);
 const decementShip = createAction(DECREMENT_SHIP, field => field);
 const changeQueue = createAction(CHANGE_QUEUE);
-
 /*
  * Methods
  * */
@@ -55,7 +53,6 @@ const destroyShip = (ship, index, type, field, array) => {
         shipSize = ship.cellsIndex;
         shipSize.length = shipSize.length - 1;
         currentIndex = i;
-
         dispatch(boatDown({shipSize, currentIndex, field}));
         if (!shipSize.length > 0) {
           if (allShips === 1) {
@@ -64,7 +61,6 @@ const destroyShip = (ship, index, type, field, array) => {
             }
             else {
               alert("К сожалению вы проиграли... Следующий раз обязательно повезет!")
-
             }
           }
           dispatch(setMissNearShip(ship.cells, clearAroundShip, field, size));
@@ -112,7 +108,6 @@ export const shoot = (index, quote) => {
     }
     else
       dispatch(shipShoot({index, status: MISS, field: MY_FIELDS}));
-
     setTimeout(dispatch(shootComp(), 1000))
   }
 };
@@ -129,10 +124,8 @@ export const shootComp = () => {
       dispatch(shootComp());
       return;
     }
-
     if (!currentCell.shipId)
       dispatch(changeQueue());
-
     if (currentCell.shipId) {
       dispatch(shipShoot({index, status: SHOT, field: COMP_FIELDS}));
       dispatch(destroyShip(game, currentCell.shipId, ALL_SHIPS_COMP, COMP_FIELDS, SHIP_COMP));
@@ -153,7 +146,6 @@ export const clearAroundShip = (index, field) => {
     }
   }
 };
-
 /*set placed cells around ship*/
 export const placedAroundShip = (index, field) => {
   return (dispatch, getState) => {
@@ -172,29 +164,35 @@ const cordParser = (number, size = 10) => {
   let x = number - y * size;
   return {x, y};
 };
-
+/*Random func*/
 const random = maxNum => {
   return Math.floor(Math.random() * maxNum);
 };
 /*1. Start ship builder for all Ships array.*/
-export const startCells = () => {
-  return async dispatch => {
-    await dispatch(generateCells({cell: generateField(15), field: MY_FIELDS}));
-    await dispatch(generateCells({cell: generateField(15), field: COMP_FIELDS}));
+export const startCells = (size) => {
+  return dispatch => {
+    dispatch(generateCells({cell: generateField(size), field: MY_FIELDS}));
+    dispatch(generateCells({cell: generateField(size), field: COMP_FIELDS}));
+    dispatch(setGroundSize(size))
   }
 };
 export const runShipGenerator = () => {
+  let size;
+  while (true) {
+    size = Number.parseInt(prompt("Enter playground size!"));
+    if (isFinite(size))
+      break;
+    alert("Ошибка")
+  }
   return dispatch => {
-    dispatch(startCells()).then(() => {
-      allShips.map((ship, index) => {
-        if (index < 10)
-          dispatch(autoGenerateShips(ship, MY_FIELDS));
-        else
-          dispatch(autoGenerateShips(ship, COMP_FIELDS));
-        return true;
-      });
+    dispatch(startCells(size));
+    allShips.map((ship, index) => {
+      if (index < 10)
+        dispatch(autoGenerateShips(ship, MY_FIELDS));
+      else
+        dispatch(autoGenerateShips(ship, COMP_FIELDS));
+      return true;
     });
-
   }
 };
 /*2. Generate ships on empty fields. Accepts one ship from array (1). If all correct, call Generator */
@@ -234,7 +232,6 @@ let autoGenerateShips = (ship, fieldsName) => {
         continue;
       break;
     }
-
     dispatch(generateShip(tmp, fieldsName, size));
     let fieldForIncrement = ALL_SHIPS;
     if (fieldsName === 'fieldsComp')
@@ -242,13 +239,11 @@ let autoGenerateShips = (ship, fieldsName) => {
     dispatch(incementShip(fieldForIncrement));
   }
 };
-
 /*3. Takes one ship and create shipObject for ships in reducer */
 const generateShip = (ship, name, size) => {
   return dispatch => {
     name === 'fieldsComp' ? dispatch(statusShipComp(ship)) : dispatch(statusShip(ship));
     dispatch(setMissNearShip(ship.cells, placedAroundShip, name, size));
-
     ship.cells.map(cell => {
       const index = cell.y * 10 + cell.x;
       cell.index = index;
@@ -257,7 +252,6 @@ const generateShip = (ship, name, size) => {
       return null;
     });
     return null;
-
   }
 };
 /*Generate cells object for battle ground*/
@@ -274,71 +268,77 @@ const generateField = (size) => {
     // status can be: empty, miss, placed, shot
     cells.push({x, y, index: i, status: 'empty'});
   }
-  return cells;
+  return fromJS(cells);
 };
-
 export const actions = {
   shoot,
   shootComp,
   runShipGenerator
 };
-
 export const initialState = fromJS({
-  /*Рамеры поля (все 3 числа должны быть одинаковые 0_о )*/
   userSize: 15,
-  fields: generateField(15),
-  fieldsComp: generateField(15),
+  fields: [],
+  fieldsComp: [],
   ships: [],
   shipsComp: [],
   allShipsComp: 0,
   allShips: 0,
   queue: true
-
 });
 
 export default handleActions({
-  [GENERATE_SHIP]: (state, {payload}) => {
-    const {x, y, index, shipId, field} = payload;
-    return state.updateIn([field, `${index}`], entry =>
-      entry.merge({
-        x, y, status: 'placed placed_s', shipId
-      }))
+    [GENERATE_SHIP]: (state, {payload}) => {
+      const {x, y, index, shipId, field} = payload;
+      return state.updateIn([field, `${index}`], entry =>
+        entry.merge({
+          x, y, status: 'placed placed_s', shipId
+        }))
+    },
+    [STATUS_SHIP]: (state, {payload}) => {
+      return state.update('ships', entry => entry.push(payload))
+    },
+    [STATUS_SHIP_COMP]: (state, {payload}) => {
+      return state.update('shipsComp', entry => entry.push(payload))
+    },
+    [SHIP_SHOOT]: (state, {payload}) => {
+      const {index, status, field} = payload;
+      console.log(payload, "ERRRRRORRRR")
+      return state.updateIn([field, index], entry => entry
+        .set('status', status))
+    },
+    [BOAT_DOWN]: (state, {payload}) => {
+      const {shipSize, currentIndex, field} = payload;
+      return state.updateIn([field, `${currentIndex}`], entry =>
+        entry.merge({
+          currentIndex: shipSize
+        }))
+    },
+    [INCREMENT_SHIP]:
+      (state, {payload}) => {
+        const allShips = state.toJS()[payload];
+        return state.set(payload, allShips + 1);
+      },
+    [DECREMENT_SHIP]:
+      (state, {payload}) => {
+        const allShips = state.toJS()[payload];
+        return state.set(payload, allShips - 1);
+      },
+    [CHANGE_QUEUE]:
+      (state) => {
+        const current = state.toJS();
+        return state.set('queue', !current.queue);
+      },
+    [GENERATE_CELLS]:
+      (state, {payload}) => {
+        const {cell, field} = payload;
+        console.log(payload);
+        return state.set(field, cell);
+      },
+    [GROUND_SIZE]:
+      (state, {payload}) => {
+        return state.set('userSize', payload);
+      }
   },
-  [STATUS_SHIP]: (state, {payload}) => {
-    return state.update('ships', entry => entry.push(payload))
-  },
-  [STATUS_SHIP_COMP]: (state, {payload}) => {
-    return state.update('shipsComp', entry => entry.push(payload))
-  },
-  [SHIP_SHOOT]: (state, {payload}) => {
-    const {index, status, field} = payload;
-    console.log(payload,"ERRRRRORRRR")
-    return state.updateIn([field, index], entry => entry
-      .set('status', status))
-  },
-  [BOAT_DOWN]: (state, {payload}) => {
-    const {shipSize, currentIndex, field} = payload;
-    return state.updateIn([field, `${currentIndex}`], entry =>
-      entry.merge({
-        currentIndex: shipSize
-      }))
-  },
-  [INCREMENT_SHIP]: (state, {payload}) => {
-    const allShips = state.toJS()[payload];
-    return state.set(payload, allShips + 1);
-  },
-  [DECREMENT_SHIP]: (state, {payload}) => {
-    const allShips = state.toJS()[payload];
-    return state.set(payload, allShips - 1);
-  },
-  [CHANGE_QUEUE]: (state) => {
-    const current = state.toJS();
-    return state.set('queue', !current.queue);
-  },
-  [GENERATE_CELLS]: (state, {payload}) => {
-    const {cell, field} = payload;
-    console.log(payload);
-    return state.set(field, cell);
-
-  }
-}, initialState);
+  initialState
+)
+;
