@@ -16,6 +16,7 @@ const INCREMENT_SHIP = 'INCREMENT_SHIP';
 const DECREMENT_SHIP = 'DECREMENT_SHIP';
 const SHIP_SHOOT = 'SHIP_SHOOT';
 const CHANGE_QUEUE = 'CHANGE_QUEUE';
+const GENERATE_CELLS = 'GENERATE_CELLS';
 
 
 const MY_FIELDS = 'fields';
@@ -28,7 +29,7 @@ const SHIP_COMP = 'shipsComp';
  * Actions
  * */
 const shipShoot = createAction(SHIP_SHOOT, cell => cell);
-
+const generateCells = createAction(GENERATE_CELLS, cell => cell);
 const boatDown = createAction(BOAT_DOWN, ship => ship);
 const setShip = createAction(GENERATE_SHIP, ship => ship);
 const statusShip = createAction(STATUS_SHIP, ship => ship);
@@ -78,18 +79,16 @@ const destroyShip = (ship, index, type, field, array) => {
 const setMissNearShip = (ship, callback, field, size) => {
   return dispatch => {
     ship.map(cell => {
-      let index =cell.y * 10 + cell.x;
-      for(let i=-1;i<2;i++){
-        for(let k=-1;k<2;k++){
-          let num=size*i+k;
-          let newIndex=num+index;
-          if (newIndex < 0 ||  newIndex>Math.pow(size,2)-1)
-                  continue;
-                else {
-                  console.log(newIndex,field)
-                  dispatch(callback(newIndex, field));
-                }
-
+      let index = cell.y * 10 + cell.x;
+      for (let i = -1; i < 2; i++) {
+        for (let k = -1; k < 2; k++) {
+          let num = size * i + k;
+          let newIndex = num + index;
+          if (newIndex < 0 || newIndex > Math.pow(size, 2) - 1)
+            continue;
+          else {
+            dispatch(callback(newIndex, field));
+          }
         }
       }
       return null;
@@ -178,16 +177,24 @@ const random = maxNum => {
   return Math.floor(Math.random() * maxNum);
 };
 /*1. Start ship builder for all Ships array.*/
+export const startCells = () => {
+  return async dispatch => {
+    await dispatch(generateCells({cell: generateField(15), field: MY_FIELDS}));
+    await dispatch(generateCells({cell: generateField(15), field: COMP_FIELDS}));
+  }
+};
 export const runShipGenerator = () => {
   return dispatch => {
-    allShips.map((ship, index) => {
-      if (index < 10)
-        dispatch(autoGenerateShips(ship, MY_FIELDS));
-      else
-        dispatch(autoGenerateShips(ship, COMP_FIELDS));
-
-      return true;
+    dispatch(startCells()).then(() => {
+      allShips.map((ship, index) => {
+        if (index < 10)
+          dispatch(autoGenerateShips(ship, MY_FIELDS));
+        else
+          dispatch(autoGenerateShips(ship, COMP_FIELDS));
+        return true;
+      });
     });
+
   }
 };
 /*2. Generate ships on empty fields. Accepts one ship from array (1). If all correct, call Generator */
@@ -303,9 +310,10 @@ export default handleActions({
   [STATUS_SHIP_COMP]: (state, {payload}) => {
     return state.update('shipsComp', entry => entry.push(payload))
   },
-  [SHIP_SHOOT]: (state, payload) => {
-    const {index, status, field} = payload.payload;
-    return state.updateIn([`${field}`, index], entry => entry
+  [SHIP_SHOOT]: (state, {payload}) => {
+    const {index, status, field} = payload;
+    console.log(payload,"ERRRRRORRRR")
+    return state.updateIn([field, index], entry => entry
       .set('status', status))
   },
   [BOAT_DOWN]: (state, {payload}) => {
@@ -326,5 +334,11 @@ export default handleActions({
   [CHANGE_QUEUE]: (state) => {
     const current = state.toJS();
     return state.set('queue', !current.queue);
+  },
+  [GENERATE_CELLS]: (state, {payload}) => {
+    const {cell, field} = payload;
+    console.log(payload);
+    return state.set(field, cell);
+
   }
 }, initialState);
